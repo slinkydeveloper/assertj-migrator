@@ -1,13 +1,9 @@
 package com.slinkydeveloper.assertjmigrator;
 
 import com.github.javaparser.ast.Node;
-import com.slinkydeveloper.assertjmigrator.migrations.assertstmt.JavaAssertEquality;
 import com.slinkydeveloper.assertjmigrator.migrations.assertstmt.JavaAssertFallback;
-import com.slinkydeveloper.assertjmigrator.migrations.assertstmt.JavaAssertInstanceOf;
 import com.slinkydeveloper.assertjmigrator.migrations.hamcrest.*;
 import com.slinkydeveloper.assertjmigrator.migrations.junit.*;
-import com.slinkydeveloper.assertjmigrator.migrations.misc.JUnitAssertFalseWithInstanceOfExpression;
-import com.slinkydeveloper.assertjmigrator.migrations.misc.JUnitAssertTrueWithInstanceOfExpression;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,13 +15,7 @@ public class MigrationMatcher {
     static {
         DEFAULT_MIGRATIONS.addAll(
                 Arrays.asList(
-                        // Common mistakes using JUnit
-                        new JUnitAssertTrueWithInstanceOfExpression(),
-                        new JUnitAssertFalseWithInstanceOfExpression(),
-
                         // Java assert statement
-                        new JavaAssertEquality(),
-                        new JavaAssertInstanceOf(),
                         new JavaAssertFallback(),
 
                         // JUnit 4/5 assertions

@@ -15,6 +15,8 @@ public class AssertJBuilder {
     private Expression assertThat;
     private Expression assertThatThrownBy;
     private Expression message;
+
+    private boolean size;
     private boolean isTrue;
     private boolean isFalse;
     private boolean isNull;
@@ -23,25 +25,43 @@ public class AssertJBuilder {
     private Expression isNotEqualTo;
     private Expression isInstanceOf;
     private Expression isNotInstanceOf;
-    private Expression isCloseTo;
-    private Expression isCloseToWithin;
-    private Expression isNotCloseTo;
-    private Expression isNotCloseToWithin;
     private Expression isSameAs;
     private Expression isNotSameAs;
+
+    // Collections
+    private Expression hasSize;
     private Expression contains;
     private List<Expression> containsList;
+    private Expression containsExactly;
+    private List<Expression> containsExactlyList;
     private Expression doesNotContain;
     private List<Expression> doesNotContainList;
+
+    // String and collections
     private Expression startsWith;
     private Expression doesNotStartWith;
     private Expression endsWith;
     private Expression doesNotEndWith;
+
+    // Hamcrest
     private Expression satisfiesHamcrestMatcher;
+
+    // Numeric bounds
     private Expression isGreaterThan;
     private Expression isGreaterThanOrEqualTo;
     private Expression isLessThan;
     private Expression isLessThanOrEqualTo;
+    private Expression isCloseTo;
+    private Expression isCloseToWithin;
+    private Expression isNotCloseTo;
+    private Expression isNotCloseToWithin;
+
+    // Throwable
+    private Expression hasMessage;
+
+    // Optional
+    private boolean isPresent;
+    private boolean isNotPresent;
 
     public static AssertJBuilder create() {
         return new AssertJBuilder();
@@ -155,6 +175,16 @@ public class AssertJBuilder {
         return this;
     }
 
+    public AssertJBuilder containsExactly(Expression argument) {
+        this.containsExactly = argument.clone();
+        return this;
+    }
+
+    public AssertJBuilder containsExactly(List<Expression> argumentList) {
+        this.containsExactlyList = new NodeList<>(argumentList.stream().map(Expression::clone).collect(Collectors.toList()));
+        return this;
+    }
+
     public AssertJBuilder doesNotContain(Expression argument) {
         this.doesNotContain = argument.clone();
         return this;
@@ -210,6 +240,31 @@ public class AssertJBuilder {
         return this;
     }
 
+    public AssertJBuilder hasMessage(Expression hasMessage) {
+        this.hasMessage = hasMessage.clone();
+        return this;
+    }
+
+    public AssertJBuilder hasSize(Expression hasSize) {
+        this.hasSize = hasSize.clone();
+        return this;
+    }
+
+    public AssertJBuilder size() {
+        this.size = true;
+        return this;
+    }
+
+    public AssertJBuilder isPresent() {
+        this.isPresent = true;
+        return this;
+    }
+
+    public AssertJBuilder isNotPresent() {
+        this.isNotPresent = true;
+        return this;
+    }
+
     public Expression build() {
         Objects.requireNonNullElse(this.assertThat, this.assertThatThrownBy);
         Expression root;
@@ -222,6 +277,10 @@ public class AssertJBuilder {
         if (message != null) {
             root = new MethodCallExpr("as", message).setScope(root);
         }
+        if (size) {
+            root = new MethodCallExpr("size").setScope(root);
+        }
+
         if (isTrue) {
             root = new MethodCallExpr(root, "isTrue");
         }
@@ -258,11 +317,20 @@ public class AssertJBuilder {
         if (isNotSameAs != null) {
             root = new MethodCallExpr("isNotSameAs", isNotSameAs).setScope(root);
         }
+        if (hasSize != null) {
+            root = new MethodCallExpr("hasSize", hasSize).setScope(root);
+        }
         if (contains != null) {
             root = new MethodCallExpr("contains", contains).setScope(root);
         }
         if (containsList != null) {
             root = new MethodCallExpr("contains").setArguments(new NodeList<>(containsList)).setScope(root);
+        }
+        if (containsExactly != null) {
+            root = new MethodCallExpr("containsExactly", containsExactly).setScope(root);
+        }
+        if (containsExactlyList != null) {
+            root = new MethodCallExpr("containsExactly").setArguments(new NodeList<>(containsExactlyList)).setScope(root);
         }
         if (doesNotContain != null) {
             root = new MethodCallExpr("doesNotContain", doesNotContain).setScope(root);
@@ -296,6 +364,15 @@ public class AssertJBuilder {
         }
         if (isLessThanOrEqualTo != null) {
             root = new MethodCallExpr("isLessThanOrEqualTo", isLessThanOrEqualTo).setScope(root);
+        }
+        if (hasMessage != null) {
+            root = new MethodCallExpr("hasMessage", hasMessage).setScope(root);
+        }
+        if (isPresent) {
+            root = new MethodCallExpr(root, "isPresent");
+        }
+        if (isNotPresent) {
+            root = new MethodCallExpr(root, "isNotPresent");
         }
 
         return root;

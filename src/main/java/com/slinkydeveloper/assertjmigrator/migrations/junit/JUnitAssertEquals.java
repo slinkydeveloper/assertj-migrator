@@ -1,6 +1,7 @@
 package com.slinkydeveloper.assertjmigrator.migrations.junit;
 
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.slinkydeveloper.assertjmigrator.migrations.common.EqualityMigrator;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class JUnitAssertEquals extends BaseJUnitAssertion {
@@ -17,7 +18,7 @@ public class JUnitAssertEquals extends BaseJUnitAssertion {
 
     @Override
     protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
-        builder.assertThat(expr.getArgument(1)).isEqualTo(expr.getArgument(0));
+        EqualityMigrator.migrateEquals(builder, expr.getArgument(1), expr.getArgument(0));
     }
 
 }

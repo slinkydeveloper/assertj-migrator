@@ -3,6 +3,7 @@ package com.slinkydeveloper.assertjmigrator.migrations.assertstmt;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.slinkydeveloper.assertjmigrator.Migration;
+import com.slinkydeveloper.assertjmigrator.migrations.common.PredicateMigrator;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 import java.util.Collections;
@@ -23,8 +24,7 @@ public class JavaAssertFallback implements Migration<AssertStmt> {
     @Override
     public void migrate(AssertStmt node) {
         node.replace(new ExpressionStmt(
-                AssertJBuilder.create().assertThat(node.getCheck())
-                        .isTrue()
+                PredicateMigrator.migrateTrue(new AssertJBuilder(), node.getCheck())
                         .build()
         ));
     }

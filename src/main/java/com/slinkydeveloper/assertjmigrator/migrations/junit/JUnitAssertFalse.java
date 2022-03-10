@@ -1,6 +1,7 @@
 package com.slinkydeveloper.assertjmigrator.migrations.junit;
 
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.slinkydeveloper.assertjmigrator.migrations.common.PredicateMigrator;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class JUnitAssertFalse extends BaseJUnitAssertion {
@@ -17,7 +18,7 @@ public class JUnitAssertFalse extends BaseJUnitAssertion {
 
     @Override
     protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
-        builder.assertThat(expr.getArgument(0)).isFalse();
+        PredicateMigrator.migrateFalse(builder, expr.getArgument(0));
     }
 
 }

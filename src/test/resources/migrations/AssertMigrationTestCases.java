@@ -15,6 +15,8 @@ import static org.junit.Assert.assertFalse;
 
 public class AssertMigrationTestCases {
 
+    Integer xInt = 1;
+    int yInt = 2;
     Object x = new Object();
     Object y = new Object();
 
@@ -25,7 +27,31 @@ public class AssertMigrationTestCases {
     }
 
     void assertEquality_expected() {
-        assertThat(x).isEqualTo(y);
+        assertThat(x).isSameAs(y);
+    }
+
+    void assertEqualityPrimitive_input() {
+        assert xInt == yInt;
+    }
+
+    void assertEqualityPrimitive_expected() {
+        assertThat(xInt).isEqualTo(yInt);
+    }
+
+    void assertNotEquality_input() {
+        assert x != y;
+    }
+
+    void assertNotEquality_expected() {
+        assertThat(x).isNotSameAs(y);
+    }
+
+    void assertNotEqualityPrimitive_input() {
+        assert xInt != yInt;
+    }
+
+    void assertNotEqualityPrimitive_expected() {
+        assertThat(xInt).isNotEqualTo(yInt);
     }
 
     // Assert instanceof

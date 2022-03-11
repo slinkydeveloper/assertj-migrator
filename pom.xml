@@ -11,7 +11,7 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <javaparser.version>3.23.1</javaparser.version>
+        <javaparser.version>3.24.0</javaparser.version>
         <junit4.version>4.13.2</junit4.version>
         <junit5.version>5.8.2</junit5.version>
         <hamcrest.version>1.3</hamcrest.version>

@@ -5,13 +5,16 @@ import java.util.*;
 public class MiscMigrationTestCases {
 
     Object x = new Object();
-    
+    Object[] arr = new Object[]{x};
+
     List<Object> list = new ArrayList<>();
     Set<Object> set = new HashSet<>();
     Map<Object, Object> map = new HashMap<>();
     Optional<Object> optional = Optional.of(x);
 
     String str = "abc";
+    
+    int num = 10;
 
     // Asserts on collections
 
@@ -240,6 +243,30 @@ public class MiscMigrationTestCases {
         assertThat(map).doesNotContainValue(x);
     }
 
+    void assertArrayLengthEquals_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(2, arr.length);
+    }
+
+    void assertArrayLengthEquals_expected() {
+        assertThat(arr).hasSize(2);
+    }
+
+    void assertArrayLengthEquality_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(arr.length == 2);
+    }
+
+    void assertArrayLengthEquality_expected() {
+        assertThat(arr).hasSize(2);
+    }
+
+    void assertArrayLengthEqualityWithNotEquals_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(true, arr.length == 2);
+    }
+
+    void assertArrayLengthEqualityWithNotEquals_expected() {
+        assertThat(arr).size().isNotEqualTo(2);
+    }
+
     // Equality with null
 
     void assertNull_input() {
@@ -368,6 +395,40 @@ public class MiscMigrationTestCases {
 
     void assertStringContains_expected() {
         assertThat(str).contains("abc");
+    }
+    
+    // Numeric bounds
+
+    void assertGreater_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(num > 10);
+    }
+
+    void assertGreater_expected() {
+        assertThat(num).isGreaterThan(10);
+    }
+
+    void assertGreaterEquals_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(num >= 10);
+    }
+
+    void assertGreaterEquals_expected() {
+        assertThat(num).isGreaterThanOrEqualTo(10);
+    }
+
+    void assertLess_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(num < 10);
+    }
+
+    void assertLess_expected() {
+        assertThat(num).isLessThan(10);
+    }
+
+    void assertLessEquals_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(num <= 10);
+    }
+
+    void assertLessEquals_expected() {
+        assertThat(num).isLessThanOrEqualTo(10);
     }
 
 }

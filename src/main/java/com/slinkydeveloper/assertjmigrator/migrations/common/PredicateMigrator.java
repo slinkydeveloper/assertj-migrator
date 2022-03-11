@@ -9,6 +9,7 @@ import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
@@ -21,9 +22,15 @@ public class PredicateMigrator {
             new InstanceOf(),
             new IsPresent(),
             new StringContains(),
+            new StringStartsWith(),
+            new StringEndsWith(),
             new CollectionContains(),
             new MapContainsKey(),
             new MapContainsValue(),
+            new GreaterThan(),
+            new GreaterThanOrEqualTo(),
+            new LessThan(),
+            new LessThanOrEqualTo(),
             new Fallback()
     );
 
@@ -197,6 +204,56 @@ public class PredicateMigrator {
         }
     }
 
+    private static class StringStartsWith implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isString),
+                    methodNameIs("startsWith")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .startsWith(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotStartWith(callExpr.getArgument(0));
+        }
+    }
+
+    private static class StringEndsWith implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isString),
+                    methodNameIs("endsWith")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .endsWith(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotEndWith(callExpr.getArgument(0));
+        }
+    }
+
     private static class CollectionContains implements PredicateMigration {
 
         @Override
@@ -270,6 +327,109 @@ public class PredicateMigrator {
             builder.assertThat(callExpr.getScope().get())
                     .doesNotContainValue(callExpr.getArgument(0));
         }
+    }
+
+    private static abstract class BinaryComparison implements PredicateMigration {
+
+        abstract BinaryExpr.Operator getOperator();
+
+        abstract BiConsumer<AssertJBuilder, Expression> trueAssert();
+
+        abstract BiConsumer<AssertJBuilder, Expression> falseAssert();
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return binaryOperatorMatches(getOperator());
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            BinaryExpr binaryExpr = actual.asBinaryExpr();
+            trueAssert().accept(builder.assertThat(binaryExpr.getLeft()), binaryExpr.getRight());
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            BinaryExpr binaryExpr = actual.asBinaryExpr();
+            falseAssert().accept(builder.assertThat(binaryExpr.getLeft()), binaryExpr.getRight());
+        }
+
+    }
+
+    private static class GreaterThan extends BinaryComparison {
+
+        @Override
+        BinaryExpr.Operator getOperator() {
+            return BinaryExpr.Operator.GREATER;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> trueAssert() {
+            return AssertJBuilder::isGreaterThan;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> falseAssert() {
+            return AssertJBuilder::isLessThanOrEqualTo;
+        }
+
+    }
+
+    private static class GreaterThanOrEqualTo extends BinaryComparison {
+
+        @Override
+        BinaryExpr.Operator getOperator() {
+            return BinaryExpr.Operator.GREATER_EQUALS;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> trueAssert() {
+            return AssertJBuilder::isGreaterThanOrEqualTo;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> falseAssert() {
+            return AssertJBuilder::isLessThan;
+        }
+
+    }
+
+    private static class LessThan extends BinaryComparison {
+
+        @Override
+        BinaryExpr.Operator getOperator() {
+            return BinaryExpr.Operator.LESS;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> trueAssert() {
+            return AssertJBuilder::isLessThan;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> falseAssert() {
+            return AssertJBuilder::isGreaterThanOrEqualTo;
+        }
+
+    }
+
+    private static class LessThanOrEqualTo extends BinaryComparison {
+
+        @Override
+        BinaryExpr.Operator getOperator() {
+            return BinaryExpr.Operator.LESS_EQUALS;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> trueAssert() {
+            return AssertJBuilder::isLessThanOrEqualTo;
+        }
+
+        @Override
+        BiConsumer<AssertJBuilder, Expression> falseAssert() {
+            return AssertJBuilder::isGreaterThan;
+        }
+
     }
 
 }

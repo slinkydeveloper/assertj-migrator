@@ -43,7 +43,11 @@ public class Predicates {
     }
 
     public static Predicate<Expression> methodDeclaredIn(Class<?> clazz) {
-        return expr -> clazz.getName().equals(expr.asMethodCallExpr().resolve().declaringType().getQualifiedName());
+        return expr -> expr.isMethodCallExpr() && clazz.getName().equals(expr.asMethodCallExpr().resolve().declaringType().getQualifiedName());
+    }
+
+    public static Predicate<Expression> binaryOperatorMatches(BinaryExpr.Operator operator) {
+        return binaryOperatorMatches(operator, expr -> true, expr -> true);
     }
 
     public static Predicate<Expression> binaryOperatorMatches(BinaryExpr.Operator operator, Predicate<Expression> left, Predicate<Expression> right) {
@@ -53,12 +57,18 @@ public class Predicates {
                 right.test(expression.asBinaryExpr().getRight());
     }
 
-    public static boolean isJUnit5Assertion(Expression expr) {
-        return methodDeclaredIn(Assertions.class).test(expr);
+    public static Predicate<Expression> fieldAccessMatches(Predicate<Expression> scopePredicate, String fieldName) {
+        return expression -> expression.isFieldAccessExpr() &&
+                scopePredicate.test(expression.asFieldAccessExpr().getScope()) &&
+                fieldName.equals(expression.asFieldAccessExpr().getName().toString());
     }
 
-    public static boolean isJUnit4Assertion(Expression expr) {
-        return methodDeclaredIn(Assert.class).test(expr);
+    public static Predicate<Expression> isJUnit5Assertion() {
+        return methodDeclaredIn(Assertions.class);
+    }
+
+    public static Predicate<Expression> isJUnit4Assertion() {
+        return methodDeclaredIn(Assert.class);
     }
 
     public static boolean isString(Expression expr) {
@@ -110,6 +120,11 @@ public class Predicates {
             return false;
         }
         return MAP.isAssignableBy(resolvedType.asReferenceType());
+    }
+
+    public static boolean isArray(Expression expr) {
+        ResolvedType resolvedType = expr.calculateResolvedType();
+        return resolvedType.isArray();
     }
 
     public static boolean isOptional(Expression expr) {

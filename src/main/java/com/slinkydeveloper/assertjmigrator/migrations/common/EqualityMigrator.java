@@ -24,6 +24,8 @@ public class EqualityMigrator {
             new EmptyList(),
             new EmptySet(),
             new EmptyMap(),
+            new ArrayLength(),
+            new EqualsBoolean(),
             new Fallback()
     );
 
@@ -342,6 +344,70 @@ public class EqualityMigrator {
         public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
             builder.assertThat(actual)
                     .isNotEmpty();
+        }
+    }
+
+    private static class ArrayLength implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return fieldAccessMatches(Predicates::isArray, "length");
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return Predicates::isIntegral;
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual.asFieldAccessExpr().getScope());
+            if (expected.isIntegerLiteralExpr() && expected.asIntegerLiteralExpr().asNumber().intValue() == 0) {
+                builder.isEmpty();
+            } else {
+                builder.hasSize(expected);
+            }
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual.asFieldAccessExpr().getScope());
+            if (expected.isIntegerLiteralExpr() && expected.asIntegerLiteralExpr().asNumber().intValue() == 0) {
+                builder.isNotEmpty();
+            } else {
+                builder.size().isNotEqualTo(expected);
+            }
+        }
+    }
+
+    private static class EqualsBoolean implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return expr -> true;
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return Expression::isBooleanLiteralExpr;
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            if (expected.asBooleanLiteralExpr().getValue()) {
+                PredicateMigrator.migrateTrue(builder, actual);
+            } else {
+                PredicateMigrator.migrateFalse(builder, actual);
+            }
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            if (expected.asBooleanLiteralExpr().getValue()) {
+                PredicateMigrator.migrateFalse(builder, actual);
+            } else {
+                PredicateMigrator.migrateTrue(builder, actual);
+            }
         }
     }
 

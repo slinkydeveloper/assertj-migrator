@@ -85,7 +85,9 @@ public class MigrationsTests {
             Statement expectedStatement = expectedMd.getBody().get().getStatements().get(0);
 
             List<Map.Entry<Migration<Node>, Node>> matchResults = defaultMigrationMatcher.match(inputStatement);
-            assertThat(matchResults).hasSize(1);
+            assertThat(matchResults)
+                    .as("Expecting one migration")
+                    .hasSize(1);
 
             // Note that this mutates the inputMd
             matchResults.get(0).getKey().migrate(matchResults.get(0).getValue());

@@ -81,12 +81,14 @@ public abstract class BaseJUnitAssertion implements MigrationMatchingExpressionP
 
     private int messageIndex(MethodCallExpr methodCallExpr) {
         if (methodArgsAre(assertionArity() + 1).test(methodCallExpr)) {
-            if (Predicates.isJUnit4Assertion(methodCallExpr)) {
+            if (Predicates.isJUnit4Assertion().test(methodCallExpr)) {
                 return 0;
             }
-            if (Predicates.isJUnit5Assertion(methodCallExpr)) {
+            if (Predicates.isJUnit5Assertion().test(methodCallExpr)) {
                 return assertionArity();
             }
+            throw new IllegalStateException(
+                    "Expected either a JUnit 4 or JUnit 5 assertion, but none of them matches for expression: " + methodCallExpr);
         }
         return -1;
     }

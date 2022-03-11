@@ -9,15 +9,14 @@ import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.Indentation;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ClassLoaderTypeSolver;
+import com.github.javaparser.resolution.SymbolResolver;
+import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
+import com.github.javaparser.utils.ProjectRoot;
 import org.assertj.core.api.ThrowingConsumer;
 import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -57,32 +56,23 @@ public class Main implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        Path startingDir = rootDirectory.toPath();
-        JarsFinder pf = new JarsFinder();
-        Files.walkFileTree(startingDir, pf);
+        final Path startingDir = rootDirectory.toPath();
 
-        if (verbose) {
-            System.out.println(
-                    "---- Found jars:\n" + pf.getFoundJars() + "\n----\n"
-            );
-        }
-
-        ClassLoaderTypeSolver classLoaderTypeSolver = new ClassLoaderTypeSolver(
-                new URLClassLoader(pf.getFoundJars().toArray(new URL[0]), Main.class.getClassLoader())
-        );
-
-        // Configure JavaParser to use type resolution
-        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(classLoaderTypeSolver);
+        // Use the SymbolSolverCollectionStrategy to infer the symbol resolved
+        final ProjectRoot projectRoot = new SymbolSolverCollectionStrategy()
+                .collect(startingDir);
+        final SymbolResolver symbolResolver = projectRoot.getSourceRoots().get(0)
+                .getParserConfiguration().getSymbolResolver()
+                .get();
 
         // Parser configuration
-        ParserConfiguration configuration = new ParserConfiguration()
-                .setSymbolResolver(symbolSolver);
-        JavaParser parser = new JavaParser(configuration);
+        final JavaParser parser = new JavaParser(new ParserConfiguration()
+                .setSymbolResolver(symbolResolver));
 
-        MigrationMatcher migrationMatcher = new MigrationMatcher();
+        final MigrationMatcher migrationMatcher = new MigrationMatcher();
 
-        Map<Path, Throwable> errors = new HashMap<>();
-        JavaTestSourceFinder migrationTargetFinder = new JavaTestSourceFinder(wrapTryConsumer(
+        final Map<Path, Throwable> errors = new HashMap<>();
+        final JavaTestSourceFinder migrationTargetFinder = new JavaTestSourceFinder(wrapTryConsumer(
                 javaFilePath -> processMatch(parser, migrationMatcher, javaFilePath),
                 errors
         ));

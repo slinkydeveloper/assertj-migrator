@@ -45,6 +45,12 @@ public class AssertJBuilder {
     private List<Expression> containsExactlyList;
     private List<Expression> doesNotContainList;
 
+    // Map
+    private Expression containsKey;
+    private Expression doesNotContainKey;
+    private Expression containsValue;
+    private Expression doesNotContainValue;
+
     // Hamcrest
     private Expression satisfiesHamcrestMatcher;
 
@@ -277,6 +283,26 @@ public class AssertJBuilder {
         return this;
     }
 
+    public AssertJBuilder containsKey(Expression argument) {
+        this.containsKey = argument.clone();
+        return this;
+    }
+
+    public AssertJBuilder doesNotContainKey(Expression argument) {
+        this.doesNotContainKey = argument.clone();
+        return this;
+    }
+
+    public AssertJBuilder containsValue(Expression argument) {
+        this.containsValue = argument.clone();
+        return this;
+    }
+
+    public AssertJBuilder doesNotContainValue(Expression argument) {
+        this.doesNotContainValue = argument.clone();
+        return this;
+    }
+
     public Expression build() {
         Objects.requireNonNullElse(this.assertThat, this.assertThatThrownBy);
         Expression root;
@@ -391,6 +417,18 @@ public class AssertJBuilder {
         }
         if (isNotEmpty) {
             root = new MethodCallExpr(root, "isNotEmpty");
+        }
+        if (containsKey != null) {
+            root = new MethodCallExpr("containsKey", containsKey).setScope(root);
+        }
+        if (doesNotContainKey != null) {
+            root = new MethodCallExpr("doesNotContainKey", doesNotContainKey).setScope(root);
+        }
+        if (containsValue != null) {
+            root = new MethodCallExpr("containsValue", containsValue).setScope(root);
+        }
+        if (doesNotContainValue != null) {
+            root = new MethodCallExpr("doesNotContainValue", doesNotContainValue).setScope(root);
         }
 
         return root;

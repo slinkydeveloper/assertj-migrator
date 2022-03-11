@@ -192,6 +192,54 @@ public class MiscMigrationTestCases {
         assertThat(map).isNotEmpty();
     }
 
+    void assertListContains_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(list.contains(x));
+    }
+
+    void assertListContains_expected() {
+        assertThat(list).contains(x);
+    }
+
+    void assertNotListContains_input() {
+        org.junit.jupiter.api.Assertions.assertFalse(list.contains(x));
+    }
+
+    void assertNotListContains_expected() {
+        assertThat(list).doesNotContain(x);
+    }
+
+    void assertMapContainsKey_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(map.containsKey(x));
+    }
+
+    void assertMapContainsKey_expected() {
+        assertThat(map).containsKey(x);
+    }
+
+    void assertNotMapContainsKey_input() {
+        org.junit.jupiter.api.Assertions.assertFalse(map.containsKey(x));
+    }
+
+    void assertNotMapContainsKey_expected() {
+        assertThat(map).doesNotContainKey(x);
+    }
+
+    void assertMapContainsValue_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(map.containsValue(x));
+    }
+
+    void assertMapContainsValue_expected() {
+        assertThat(map).containsValue(x);
+    }
+
+    void assertNotMapContainsValue_input() {
+        org.junit.jupiter.api.Assertions.assertFalse(map.containsValue(x));
+    }
+
+    void assertNotMapContainsValue_expected() {
+        assertThat(map).doesNotContainValue(x);
+    }
+
     // Equality with null
 
     void assertNull_input() {

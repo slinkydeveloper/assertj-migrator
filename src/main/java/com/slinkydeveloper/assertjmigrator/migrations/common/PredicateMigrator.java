@@ -21,6 +21,9 @@ public class PredicateMigrator {
             new InstanceOf(),
             new IsPresent(),
             new StringContains(),
+            new CollectionContains(),
+            new MapContainsKey(),
+            new MapContainsValue(),
             new Fallback()
     );
 
@@ -191,6 +194,81 @@ public class PredicateMigrator {
             MethodCallExpr callExpr = actual.asMethodCallExpr();
             builder.assertThat(callExpr.getScope().get())
                     .doesNotContain(callExpr.getArgument(0));
+        }
+    }
+
+    private static class CollectionContains implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isCollection),
+                    methodNameIs("contains")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .contains(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotContain(callExpr.getArgument(0));
+        }
+    }
+
+    private static class MapContainsKey implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isMap),
+                    methodNameIs("containsKey")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .containsKey(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotContainKey(callExpr.getArgument(0));
+        }
+    }
+
+    private static class MapContainsValue implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isMap),
+                    methodNameIs("containsValue")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .containsValue(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotContainValue(callExpr.getArgument(0));
         }
     }
 

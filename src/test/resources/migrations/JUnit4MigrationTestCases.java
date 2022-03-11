@@ -32,6 +32,10 @@ public class JUnit4MigrationTestCases {
 
     boolean b = true;
 
+    String msg = "abc";
+
+
+
     // Assert equals/not equals
     
     void assertEquals_input() {
@@ -276,6 +280,26 @@ public class JUnit4MigrationTestCases {
         assertThatThrownBy(() -> {
             throw new IllegalArgumentException();
         }).as("some msg").isInstanceOf(IllegalArgumentException.class);
+    }
+
+    void assertThrowsWithMessageVariable_input() {
+        assertThrows(msg, IllegalArgumentException.class, () -> {
+            throw new IllegalArgumentException();
+        });
+    }
+
+    void assertThrowsWithMessageVariable_expected() {
+        assertThatThrownBy(() -> {
+            throw new IllegalArgumentException();
+        }).as(msg).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    void assertThrowsWithMessageVariableAndLambdaReturningString_input() {
+        assertThrows(msg, IllegalArgumentException.class, () -> msg);
+    }
+
+    void assertThrowsWithMessageVariableAndLambdaReturningString_expected() {
+        assertThatThrownBy(() -> msg).as(msg).isInstanceOf(IllegalArgumentException.class);
     }
 
     // Fail

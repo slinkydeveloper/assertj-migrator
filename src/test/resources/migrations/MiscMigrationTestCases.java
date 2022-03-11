@@ -11,6 +11,8 @@ public class MiscMigrationTestCases {
     Map<Object, Object> map = new HashMap<>();
     Optional<Object> optional = Optional.of(x);
 
+    String str = "abc";
+
     // Asserts on collections
 
     void assertSingletonList_input() {
@@ -91,6 +93,103 @@ public class MiscMigrationTestCases {
 
     void assertNotMapSize_expected() {
         assertThat(map).size().isNotEqualTo(1);
+    }
+
+    void assertListSize0_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(0, list.size());
+    }
+
+    void assertListSize0_expected() {
+        assertThat(list).isEmpty();
+    }
+
+    void assertSetSize0_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(0, set.size());
+    }
+
+    void assertSetSize0_expected() {
+        assertThat(set).isEmpty();
+    }
+
+    void assertMapSize0_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(0, map.size());
+    }
+
+    void assertMapSize0_expected() {
+        assertThat(map).isEmpty();
+    }
+
+    void assertNotListSize0_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(0, list.size());
+    }
+
+    void assertNotListSize0_expected() {
+        assertThat(list).isNotEmpty();
+    }
+
+    void assertNotSetSize0_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(0, set.size());
+    }
+
+    void assertNotSetSize0_expected() {
+        assertThat(set).isNotEmpty();
+    }
+
+    void assertNotMapSize0_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(0, map.size());
+    }
+
+    void assertNotMapSize0_expected() {
+        assertThat(map).isNotEmpty();
+    }
+
+
+    void assertEmptyList_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(Collections.emptyList(), list);
+    }
+
+    void assertEmptyList_expected() {
+        assertThat(list).isEmpty();
+    }
+
+    void assertEmptySet_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(Collections.emptySet(), set);
+    }
+
+    void assertEmptySet_expected() {
+        assertThat(set).isEmpty();
+    }
+
+    void assertEmptyMap_input() {
+        org.junit.jupiter.api.Assertions.assertEquals(Collections.emptyMap(), map);
+    }
+
+    void assertEmptyMap_expected() {
+        assertThat(map).isEmpty();
+    }
+
+    void assertNotEmptyList_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(Collections.emptyList(), list);
+    }
+
+    void assertNotEmptyList_expected() {
+        assertThat(list).isNotEmpty();
+    }
+
+    void assertNotEmptySet_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(Collections.emptySet(), set);
+    }
+
+    void assertNotEmptySet_expected() {
+        assertThat(set).isNotEmpty();
+    }
+
+    void assertNotEmptyMap_input() {
+        org.junit.jupiter.api.Assertions.assertNotEquals(Collections.emptyMap(), map);
+    }
+
+    void assertNotEmptyMap_expected() {
+        assertThat(map).isNotEmpty();
     }
 
     // Equality with null
@@ -203,6 +302,24 @@ public class MiscMigrationTestCases {
 
     void assertIsNotPresent_expected() {
         assertThat(optional).isNotPresent();
+    }
+
+    // Strings
+
+    void assertEmptyString_input() {
+        org.junit.jupiter.api.Assertions.assertEquals("", str);
+    }
+
+    void assertEmptyString_expected() {
+        assertThat(str).isEmpty();
+    }
+
+    void assertStringContains_input() {
+        org.junit.jupiter.api.Assertions.assertTrue(str.contains("abc"));
+    }
+
+    void assertStringContains_expected() {
+        assertThat(str).contains("abc");
     }
 
 }

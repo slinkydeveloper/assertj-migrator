@@ -3,6 +3,7 @@ package com.slinkydeveloper.assertjmigrator.migrations.common;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
@@ -19,6 +20,7 @@ public class PredicateMigrator {
             new NotEquality(),
             new InstanceOf(),
             new IsPresent(),
+            new StringContains(),
             new Fallback()
     );
 
@@ -164,6 +166,31 @@ public class PredicateMigrator {
         @Override
         public void migrateFalse(AssertJBuilder builder, Expression actual) {
             builder.assertThat(actual.asMethodCallExpr().getScope().get()).isNotPresent();
+        }
+    }
+
+    private static class StringContains implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(Predicates::isString),
+                    methodNameIs("contains")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .contains(callExpr.getArgument(0));
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            MethodCallExpr callExpr = actual.asMethodCallExpr();
+            builder.assertThat(callExpr.getScope().get())
+                    .doesNotContain(callExpr.getArgument(0));
         }
     }
 

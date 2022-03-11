@@ -20,6 +20,10 @@ public class EqualityMigrator {
             new Singleton(),
             new ThrowableMessage(),
             new Null(),
+            new EmptyString(),
+            new EmptyList(),
+            new EmptySet(),
+            new EmptyMap(),
             new Fallback()
     );
 
@@ -127,15 +131,22 @@ public class EqualityMigrator {
 
         @Override
         public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
-            builder.assertThat(actual.asMethodCallExpr().getScope().get())
-                    .hasSize(expected);
+            builder.assertThat(actual.asMethodCallExpr().getScope().get());
+            if (expected.isIntegerLiteralExpr() && expected.asIntegerLiteralExpr().asNumber().intValue() == 0) {
+                builder.isEmpty();
+            } else {
+                builder.hasSize(expected);
+            }
         }
 
         @Override
         public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
-            builder.assertThat(actual.asMethodCallExpr().getScope().get())
-                    .size()
-                    .isNotEqualTo(expected);
+            builder.assertThat(actual.asMethodCallExpr().getScope().get());
+            if (expected.isIntegerLiteralExpr() && expected.asIntegerLiteralExpr().asNumber().intValue() == 0) {
+                builder.isNotEmpty();
+            } else {
+                builder.size().isNotEqualTo(expected);
+            }
         }
     }
 
@@ -222,6 +233,115 @@ public class EqualityMigrator {
         @Override
         public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
             builder.assertThat(actual).isNotEqualTo(expected);
+        }
+    }
+
+    private static class EmptyString implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return Predicates::isString;
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return exp -> exp.isStringLiteralExpr() && exp.asStringLiteralExpr().getValue().isEmpty();
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isEmpty();
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isNotEmpty();
+        }
+    }
+
+    private static class EmptyList implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return Predicates::isList;
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return and(
+                    Predicates.methodDeclaredIn(Collections.class),
+                    Predicates.methodNameIs("emptyList")
+            );
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isEmpty();
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isNotEmpty();
+        }
+    }
+
+    private static class EmptySet implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return Predicates::isSet;
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return and(
+                    Predicates.methodDeclaredIn(Collections.class),
+                    Predicates.methodNameIs("emptySet")
+            );
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isEmpty();
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isNotEmpty();
+        }
+    }
+
+    private static class EmptyMap implements EqualityMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return Predicates::isMap;
+        }
+
+        @Override
+        public Predicate<Expression> expectedPredicate() {
+            return and(
+                    Predicates.methodDeclaredIn(Collections.class),
+                    Predicates.methodNameIs("emptyMap")
+            );
+        }
+
+        @Override
+        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isEmpty();
+        }
+
+        @Override
+        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
+            builder.assertThat(actual)
+                    .isNotEmpty();
         }
     }
 

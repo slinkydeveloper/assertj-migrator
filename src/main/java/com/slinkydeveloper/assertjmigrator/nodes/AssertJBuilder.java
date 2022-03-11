@@ -28,20 +28,22 @@ public class AssertJBuilder {
     private Expression isSameAs;
     private Expression isNotSameAs;
 
-    // Collections
-    private Expression hasSize;
-    private Expression contains;
-    private List<Expression> containsList;
-    private Expression containsExactly;
-    private List<Expression> containsExactlyList;
-    private Expression doesNotContain;
-    private List<Expression> doesNotContainList;
-
     // String and collections
     private Expression startsWith;
     private Expression doesNotStartWith;
     private Expression endsWith;
     private Expression doesNotEndWith;
+    private boolean isEmpty;
+    private boolean isNotEmpty;
+    private Expression contains;
+    private Expression doesNotContain;
+
+    // Collections
+    private Expression hasSize;
+    private List<Expression> containsList;
+    private Expression containsExactly;
+    private List<Expression> containsExactlyList;
+    private List<Expression> doesNotContainList;
 
     // Hamcrest
     private Expression satisfiesHamcrestMatcher;
@@ -265,6 +267,16 @@ public class AssertJBuilder {
         return this;
     }
 
+    public AssertJBuilder isEmpty() {
+        this.isEmpty = true;
+        return this;
+    }
+
+    public AssertJBuilder isNotEmpty() {
+        this.isNotEmpty = true;
+        return this;
+    }
+
     public Expression build() {
         Objects.requireNonNullElse(this.assertThat, this.assertThatThrownBy);
         Expression root;
@@ -373,6 +385,12 @@ public class AssertJBuilder {
         }
         if (isNotPresent) {
             root = new MethodCallExpr(root, "isNotPresent");
+        }
+        if (isEmpty) {
+            root = new MethodCallExpr(root, "isEmpty");
+        }
+        if (isNotEmpty) {
+            root = new MethodCallExpr(root, "isNotEmpty");
         }
 
         return root;

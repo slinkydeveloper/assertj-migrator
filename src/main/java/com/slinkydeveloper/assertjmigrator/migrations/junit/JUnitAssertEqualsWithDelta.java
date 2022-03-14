@@ -9,8 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.methodArgMatches;
-import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.or;
+import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
 
 public class JUnitAssertEqualsWithDelta extends BaseJUnitAssertion {
 
@@ -26,13 +25,14 @@ public class JUnitAssertEqualsWithDelta extends BaseJUnitAssertion {
 
     @Override
     protected Predicate<Expression> additionalPredicate(int offset) {
-        return methodArgMatches(offset + 2, or(Predicates::isFloat, Predicates::isDouble));
+        return methodArgMatches(offset + 2, or(Predicates::isFloat, Predicates::isDouble, Expression::isIntegerLiteralExpr));
     }
 
     @Override
     protected void fillBuilder(AssertJBuilder builder, MethodCallExpr node) {
         builder.assertThat(node.getArgument(1));
-        if (node.getArgument(2).isDoubleLiteralExpr() && node.getArgument(2).asDoubleLiteralExpr().asDouble() == 0) {
+        Expression offsetArg = node.getArgument(2);
+        if (isLiteralEqualToZero(offsetArg)) {
             // Assert equals is enough in this case
             builder.isEqualTo(node.getArgument(0));
             return;

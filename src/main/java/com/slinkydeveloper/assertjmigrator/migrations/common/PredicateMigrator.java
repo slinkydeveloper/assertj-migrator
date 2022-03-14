@@ -30,31 +30,38 @@ public class PredicateMigrator {
             new GreaterThan(),
             new GreaterThanOrEqualTo(),
             new LessThan(),
-            new LessThanOrEqualTo(),
-            new Fallback()
+            new LessThanOrEqualTo()
     );
 
     private PredicateMigrator() {
     }
 
     public static AssertJBuilder migrateTrue(AssertJBuilder builder, Expression actual) {
-        for (PredicateMigration equalityMigration : migrations) {
-            if (equalityMigration.actualPredicate().test(actual)) {
-                equalityMigration.migrateTrue(builder, actual);
-                return builder;
+        for (PredicateMigration predicateMigration : migrations) {
+            try {
+                if (predicateMigration.actualPredicate().test(actual)) {
+                    predicateMigration.migrateTrue(builder, actual);
+                    return builder;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while trying to match migration " + predicateMigration.getClass() + " for expression " + actual);
             }
         }
-        throw new IllegalStateException("Requested a migration on an unsupported predicate: " + actual);
+        return builder.assertThat(actual).isTrue();
     }
 
     public static AssertJBuilder migrateFalse(AssertJBuilder builder, Expression actual) {
         for (PredicateMigration equalityMigration : migrations) {
-            if (equalityMigration.actualPredicate().test(actual)) {
-                equalityMigration.migrateFalse(builder, actual);
-                return builder;
+            try {
+                if (equalityMigration.actualPredicate().test(actual)) {
+                    equalityMigration.migrateFalse(builder, actual);
+                    return builder;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while trying to match migration " + equalityMigration.getClass() + " for expression " + actual);
             }
         }
-        throw new IllegalStateException("Requested a migration on an unsupported predicate " + actual);
+        return builder.assertThat(actual).isFalse();
     }
 
     /**
@@ -69,24 +76,6 @@ public class PredicateMigrator {
     }
 
     // --- Equality migrations
-
-    private static class Fallback implements PredicateMigration {
-
-        @Override
-        public Predicate<Expression> actualPredicate() {
-            return e -> true;
-        }
-
-        @Override
-        public void migrateTrue(AssertJBuilder builder, Expression actual) {
-            builder.assertThat(actual).isTrue();
-        }
-
-        @Override
-        public void migrateFalse(AssertJBuilder builder, Expression actual) {
-            builder.assertThat(actual).isFalse();
-        }
-    }
 
     private static class Equality implements PredicateMigration {
 

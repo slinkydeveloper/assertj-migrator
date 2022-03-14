@@ -25,8 +25,7 @@ public class EqualityMigrator {
             new EmptySet(),
             new EmptyMap(),
             new ArrayLength(),
-            new EqualsBoolean(),
-            new Fallback()
+            new EqualsBoolean()
     );
 
     private EqualityMigrator() {
@@ -34,22 +33,30 @@ public class EqualityMigrator {
 
     public static AssertJBuilder migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
         for (EqualityMigration equalityMigration : migrations) {
-            if (equalityMigration.actualPredicate().test(actual) && equalityMigration.expectedPredicate().test(expected)) {
-                equalityMigration.migrateEquals(builder, actual, expected);
-                return builder;
+            try {
+                if (equalityMigration.actualPredicate().test(actual) && equalityMigration.expectedPredicate().test(expected)) {
+                    equalityMigration.migrateEquals(builder, actual, expected);
+                    return builder;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while trying to match migration " + equalityMigration.getClass() + " for expression " + actual);
             }
         }
-        throw new IllegalStateException("Requested a migration on an unsupported equality predicate");
+        return builder.assertThat(actual).isEqualTo(expected);
     }
 
     public static AssertJBuilder migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
         for (EqualityMigration equalityMigration : migrations) {
-            if (equalityMigration.actualPredicate().test(actual) && equalityMigration.expectedPredicate().test(expected)) {
-                equalityMigration.migrateNotEquals(builder, actual, expected);
-                return builder;
+            try {
+                if (equalityMigration.actualPredicate().test(actual) && equalityMigration.expectedPredicate().test(expected)) {
+                    equalityMigration.migrateNotEquals(builder, actual, expected);
+                    return builder;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while trying to match migration " + equalityMigration.getClass() + " for expression " + actual);
             }
         }
-        throw new IllegalStateException("Requested a migration on an unsupported equality predicate");
+        return builder.assertThat(actual).isNotEqualTo(expected);
     }
 
     /**
@@ -66,29 +73,6 @@ public class EqualityMigrator {
     }
 
     // --- Equality migrations
-
-    private static class Fallback implements EqualityMigration {
-
-        @Override
-        public Predicate<Expression> actualPredicate() {
-            return e -> true;
-        }
-
-        @Override
-        public Predicate<Expression> expectedPredicate() {
-            return e -> true;
-        }
-
-        @Override
-        public void migrateEquals(AssertJBuilder builder, Expression actual, Expression expected) {
-            builder.assertThat(actual).isEqualTo(expected);
-        }
-
-        @Override
-        public void migrateNotEquals(AssertJBuilder builder, Expression actual, Expression expected) {
-            builder.assertThat(actual).isNotEqualTo(expected);
-        }
-    }
 
     private static class Null implements EqualityMigration {
 

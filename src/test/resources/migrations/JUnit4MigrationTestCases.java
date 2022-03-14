@@ -88,6 +88,14 @@ public class JUnit4MigrationTestCases {
         assertThat(yFloat).isCloseTo(xFloat, within(deltaFloat));
     }
 
+    void assertEqualsIntLiteralDelta_input() {
+        assertEquals(xFloat, yFloat, 0);
+    }
+
+    void assertEqualsIntLiteralDelta_expected() {
+        assertThat(yFloat).isEqualTo(xFloat);
+    }
+
     void assertEqualsFloatDeltaWithMessage_input() {
         assertEquals("some msg", xFloat, yFloat, deltaFloat);
     }

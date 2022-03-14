@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class Predicates {
 
-    private static final ReflectionTypeSolver TYPE_SOLVER = new ReflectionTypeSolver(false);
+    private static final ReflectionTypeSolver TYPE_SOLVER = new ReflectionTypeSolver();
     private static final ResolvedType THROWABLE = new ReferenceTypeImpl(TYPE_SOLVER.solveType(Throwable.class.getName()), TYPE_SOLVER);
     private static final ResolvedType COLLECTION = new ReferenceTypeImpl(TYPE_SOLVER.solveType(Collection.class.getName()), TYPE_SOLVER);
     private static final ResolvedType LIST = new ReferenceTypeImpl(TYPE_SOLVER.solveType(List.class.getName()), TYPE_SOLVER);
@@ -175,6 +175,11 @@ public class Predicates {
     public static boolean isPrimitive(Expression expr) {
         ResolvedType resolvedType = expr.calculateResolvedType();
         return !resolvedType.isTypeVariable() && resolvedType.isPrimitive();
+    }
+
+    public static boolean isLiteralEqualToZero(Expression expr) {
+        return (expr.isDoubleLiteralExpr() && expr.asDoubleLiteralExpr().asDouble() == 0) ||
+                (expr.isIntegerLiteralExpr() && expr.asIntegerLiteralExpr().asNumber().intValue() == 0);
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class Predicates {
 
-    private static final ReflectionTypeSolver TYPE_SOLVER = new ReflectionTypeSolver();
+    private static final ReflectionTypeSolver TYPE_SOLVER = new ReflectionTypeSolver(false);
     private static final ResolvedType THROWABLE = new ReferenceTypeImpl(TYPE_SOLVER.solveType(Throwable.class.getName()), TYPE_SOLVER);
     private static final ResolvedType COLLECTION = new ReferenceTypeImpl(TYPE_SOLVER.solveType(Collection.class.getName()), TYPE_SOLVER);
     private static final ResolvedType LIST = new ReferenceTypeImpl(TYPE_SOLVER.solveType(List.class.getName()), TYPE_SOLVER);
@@ -175,6 +175,22 @@ public class Predicates {
     public static boolean isPrimitive(Expression expr) {
         ResolvedType resolvedType = expr.calculateResolvedType();
         return !resolvedType.isTypeVariable() && resolvedType.isPrimitive();
+    }
+
+    /**
+     * This wraps the predicate in a try catch, which returns false in case the predicate expression throws an exception.
+     * <p>
+     * This should be used for predicates known to be problematic, in particular with type inference,
+     * when a fallback is always available (e.g. hamcrest migrations).
+     */
+    public static Predicate<Expression> unsafe(Predicate<Expression> predicate) {
+        return expr -> {
+            try {
+                return predicate.test(expr);
+            } catch (Throwable e) {
+                return false;
+            }
+        };
     }
 
     @SafeVarargs

@@ -44,6 +44,8 @@ public class AssertJBuilder {
     private Expression containsExactly;
     private List<Expression> containsExactlyList;
     private List<Expression> doesNotContainList;
+    private Expression containsExactlyInAnyOrder;
+    private List<Expression> containsExactlyInAnyOrderList;
 
     // Map
     private Expression containsKey;
@@ -190,6 +192,16 @@ public class AssertJBuilder {
 
     public AssertJBuilder containsExactly(List<Expression> argumentList) {
         this.containsExactlyList = new NodeList<>(argumentList.stream().map(Expression::clone).collect(Collectors.toList()));
+        return this;
+    }
+
+    public AssertJBuilder containsExactlyInAnyOrder(Expression argument) {
+        this.containsExactlyInAnyOrder = argument.clone();
+        return this;
+    }
+
+    public AssertJBuilder containsExactlyInAnyOrder(List<Expression> argumentList) {
+        this.containsExactlyInAnyOrderList = new NodeList<>(argumentList.stream().map(Expression::clone).collect(Collectors.toList()));
         return this;
     }
 
@@ -369,6 +381,12 @@ public class AssertJBuilder {
         }
         if (containsExactlyList != null) {
             root = new MethodCallExpr("containsExactly").setArguments(new NodeList<>(containsExactlyList)).setScope(root);
+        }
+        if (containsExactlyInAnyOrder != null) {
+            root = new MethodCallExpr("containsExactlyInAnyOrder", containsExactlyInAnyOrder).setScope(root);
+        }
+        if (containsExactlyInAnyOrderList != null) {
+            root = new MethodCallExpr("containsExactlyInAnyOrder").setArguments(new NodeList<>(containsExactlyInAnyOrderList)).setScope(root);
         }
         if (doesNotContain != null) {
             root = new MethodCallExpr("doesNotContain", doesNotContain).setScope(root);

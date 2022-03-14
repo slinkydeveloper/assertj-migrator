@@ -61,7 +61,8 @@ public class MigrationsTests {
                 .get();
 
         // Get methods
-        List<MethodDeclaration> methods = cu.findAll(MethodDeclaration.class);
+        List<MethodDeclaration> methods = cu.findAll(MethodDeclaration.class, methodDeclaration ->
+                methodDeclaration.getNameAsString().contains(INPUT_SUFFIX) || methodDeclaration.getNameAsString().contains(EXPECTED_SUFFIX));
         Map<String, MethodDeclaration> methodsByName = methods.stream().collect(Collectors.toMap(
                 MethodDeclaration::getNameAsString,
                 Function.identity()

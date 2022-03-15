@@ -3,7 +3,7 @@ package com.slinkydeveloper.assertjmigrator.migrations.junit;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationMatchingExpressionPredicate;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
 
-public class JUnitFail implements MigrationMatchingExpressionPredicate<MethodCallExpr> {
+public class JUnitFail implements MigrationRule<MethodCallExpr> {
 
     private static final Predicate<Expression> FAIL = methodArgsAre(0);
     private static final Predicate<Expression> FAIL_STRING = and(methodArgsAre(1), methodArgMatches(0, Predicates::isString));

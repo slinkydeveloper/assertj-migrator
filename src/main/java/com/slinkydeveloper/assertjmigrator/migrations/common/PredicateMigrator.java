@@ -30,7 +30,8 @@ public class PredicateMigrator {
             new GreaterThan(),
             new GreaterThanOrEqualTo(),
             new LessThan(),
-            new LessThanOrEqualTo()
+            new LessThanOrEqualTo(),
+            new IsEmpty()
     );
 
     private PredicateMigrator() {
@@ -419,6 +420,27 @@ public class PredicateMigrator {
             return AssertJBuilder::isGreaterThan;
         }
 
+    }
+
+    private static class IsEmpty implements PredicateMigration {
+
+        @Override
+        public Predicate<Expression> actualPredicate() {
+            return and(
+                    methodScopeMatches(or(Predicates::isCollection, Predicates::isMap)),
+                    methodNameIs("isEmpty")
+            );
+        }
+
+        @Override
+        public void migrateTrue(AssertJBuilder builder, Expression actual) {
+            builder.assertThat(actual.asMethodCallExpr().getScope().get()).isEmpty();
+        }
+
+        @Override
+        public void migrateFalse(AssertJBuilder builder, Expression actual) {
+            builder.assertThat(actual.asMethodCallExpr().getScope().get()).isNotEmpty();
+        }
     }
 
 }

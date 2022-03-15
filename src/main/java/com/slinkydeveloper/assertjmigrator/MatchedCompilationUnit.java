@@ -4,18 +4,19 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Name;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class MigrationTarget {
+public class MatchedCompilationUnit {
 
     private final Path path;
     private final CompilationUnit compilationUnit;
-    private final List<Map.Entry<Migration<Node>, Node>> matchedMigrations;
+    private final List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrations;
 
-    public MigrationTarget(Path path, CompilationUnit compilationUnit, List<Map.Entry<Migration<Node>, Node>> matchedMigrations) {
+    public MatchedCompilationUnit(Path path, CompilationUnit compilationUnit, List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrations) {
         this.path = path;
         this.compilationUnit = compilationUnit;
         this.matchedMigrations = matchedMigrations;
@@ -29,7 +30,7 @@ public class MigrationTarget {
         return compilationUnit;
     }
 
-    public List<Map.Entry<Migration<Node>, Node>> getMatchedMigrations() {
+    public List<Map.Entry<MigrationRule<Node>, Node>> getMatchedMigrations() {
         return matchedMigrations;
     }
 

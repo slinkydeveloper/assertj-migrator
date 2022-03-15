@@ -26,6 +26,8 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRules;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
@@ -39,12 +41,12 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MigrationsTests {
+public class MigrationRulesTests {
 
     private static final String INPUT_SUFFIX = "_input";
     private static final String EXPECTED_SUFFIX = "_expected";
 
-    private static final MigrationMatcher defaultMigrationMatcher = new MigrationMatcher();
+    private static final MigrationRules DEFAULT_MIGRATION_SET = new MigrationRules();
 
     private static Stream<DynamicTest> parseTestCases(String filename) throws Exception {
         // Configure JavaParser to use type resolution
@@ -56,7 +58,7 @@ public class MigrationsTests {
         JavaParser parser = new JavaParser(configuration);
 
         // Parse JUnit5MigrationTestCases
-        CompilationUnit cu = parser.parse(Path.of(MigrationsTests.class.getResource(filename).toURI()))
+        CompilationUnit cu = parser.parse(Path.of(MigrationRulesTests.class.getResource(filename).toURI()))
                 .getResult()
                 .get();
 
@@ -85,7 +87,7 @@ public class MigrationsTests {
             Statement inputStatement = inputMd.getBody().get().getStatements().get(0);
             Statement expectedStatement = expectedMd.getBody().get().getStatements().get(0);
 
-            List<Map.Entry<Migration<Node>, Node>> matchResults = defaultMigrationMatcher.match(inputStatement);
+            List<Map.Entry<MigrationRule<Node>, Node>> matchResults = DEFAULT_MIGRATION_SET.match(inputStatement);
             assertThat(matchResults)
                     .as("Expecting one migration")
                     .hasSize(1);

@@ -2,14 +2,15 @@ package com.slinkydeveloper.assertjmigrator.migrations.assertstmt;
 
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.slinkydeveloper.assertjmigrator.Migration;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.migrations.common.PredicateMigrator;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
-public class JavaAssertFallback implements Migration<AssertStmt> {
+public class JavaAssertFallback implements MigrationRule<AssertStmt> {
 
     @Override
     public Class<AssertStmt> matchedNode() {
@@ -17,8 +18,8 @@ public class JavaAssertFallback implements Migration<AssertStmt> {
     }
 
     @Override
-    public boolean matches(AssertStmt assertStmt) {
-        return true;
+    public Predicate<AssertStmt> predicate() {
+        return x -> true;
     }
 
     @Override

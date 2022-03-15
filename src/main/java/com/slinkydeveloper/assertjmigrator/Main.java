@@ -1,7 +1,6 @@
 package com.slinkydeveloper.assertjmigrator;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -9,22 +8,21 @@ import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.Indentation;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
-import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
-import org.assertj.core.api.ThrowingConsumer;
+import com.github.javaparser.utils.SourceRoot;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRules;
 import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "main", mixinStandardHelpOptions = true, version = "0.0.1",
@@ -44,45 +42,41 @@ public class Main implements Callable<Integer> {
         System.exit(new CommandLine(new Main()).execute(args));
     }
 
-    private static <T> Consumer<T> wrapTryConsumer(ThrowingConsumer<T> processFunction, Map<T, Throwable> processingErrors) {
-        return f -> {
-            try {
-                processFunction.accept(f);
-            } catch (Throwable e) {
-                processingErrors.put(f, e);
-            }
-        };
-    }
-
     @Override
     public Integer call() throws Exception {
-        final Path startingDir = rootDirectory.toPath();
+        final MigrationRules migrationRules = new MigrationRules();
+
+        final Path rootPath = rootDirectory.toPath();
 
         // Use the SymbolSolverCollectionStrategy to infer the symbol resolved
         final ProjectRoot projectRoot = new SymbolSolverCollectionStrategy()
-                .collect(startingDir);
-        final SymbolResolver symbolResolver = projectRoot.getSourceRoots().get(0)
-                .getParserConfiguration().getSymbolResolver()
-                .get();
+                .collect(rootPath);
 
-        // Parser configuration
-        final JavaParser parser = new JavaParser(new ParserConfiguration()
-                .setSymbolResolver(symbolResolver));
+        final Map<Path, Throwable> processingErrors = new HashMap<>();
 
-        final MigrationMatcher migrationMatcher = new MigrationMatcher();
-
-        final Map<Path, Throwable> errors = new HashMap<>();
-        final JavaTestSourceFinder migrationTargetFinder = new JavaTestSourceFinder(wrapTryConsumer(
-                javaFilePath -> processMatch(parser, migrationMatcher, javaFilePath),
-                errors
-        ));
-        Files.walkFileTree(startingDir, migrationTargetFinder);
+        projectRoot.getSourceRoots()
+                .stream()
+                .filter(source -> source.getRoot().endsWith(Path.of("test", "java")))
+                .forEach(source -> {
+                    try {
+                        source.parseParallelized((localPath, absolutePath, result) -> {
+                            try {
+                                processMatch(result, migrationRules, absolutePath);
+                            } catch (Throwable e) {
+                                processingErrors.put(source.getRoot(), e);
+                            }
+                            return SourceRoot.Callback.Result.DONT_SAVE;
+                        });
+                    } catch (Throwable e) {
+                        processingErrors.put(source.getRoot(), e);
+                    }
+                });
 
         System.out.println("---- Processing completed ----");
 
-        if (!errors.isEmpty()) {
-            System.out.println("---- Errors: " + errors.size() + " ----");
-            errors.forEach((path, throwable) -> {
+        if (!processingErrors.isEmpty()) {
+            System.out.println("---- Errors: " + processingErrors.size() + " ----");
+            processingErrors.forEach((path, throwable) -> {
                 System.out.println("-- File: " + path);
                 throwable.printStackTrace(System.out);
                 System.out.flush();
@@ -92,17 +86,17 @@ public class Main implements Callable<Integer> {
         return 0;
     }
 
-    private void processMatch(JavaParser parser, MigrationMatcher migrationMatcher, Path javaFile) throws Throwable {
+    private void processMatch(ParseResult<CompilationUnit> parseResult, MigrationRules migrationRules, Path javaFile) throws Throwable {
         // Parse the file
-        CompilationUnit cu = parser.parse(javaFile).getResult().get();
+        CompilationUnit cu = parseResult.getResult().get();
         CompilationUnit originalCu = cu.clone();
 
-        List<Map.Entry<Migration<Node>, Node>> matchedMigrationsForCompilationUnit = migrationMatcher.match(cu);
+        List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrationsForCompilationUnit = migrationRules.match(cu);
         if (matchedMigrationsForCompilationUnit.isEmpty()) {
             return;
         }
 
-        MigrationTarget match = new MigrationTarget(javaFile, cu, matchedMigrationsForCompilationUnit);
+        MatchedCompilationUnit match = new MatchedCompilationUnit(javaFile, cu, matchedMigrationsForCompilationUnit);
 
         if (verbose) {
             System.out.println("--- " + match.getPath());

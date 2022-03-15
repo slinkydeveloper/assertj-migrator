@@ -1,4 +1,4 @@
-package com.slinkydeveloper.assertjmigrator;
+package com.slinkydeveloper.assertjmigrator.migrations;
 
 import com.github.javaparser.ast.Node;
 import com.slinkydeveloper.assertjmigrator.migrations.assertstmt.JavaAssertFallback;
@@ -8,12 +8,15 @@ import com.slinkydeveloper.assertjmigrator.migrations.junit.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MigrationMatcher {
+/**
+ * Contains the set of migrations that can be matched.
+ */
+public class MigrationRules {
 
-    private static final List<Migration<?>> DEFAULT_MIGRATIONS = new ArrayList<>();
+    private static final List<MigrationRule<?>> DEFAULT_MIGRATION_RULES = new ArrayList<>();
 
     static {
-        DEFAULT_MIGRATIONS.addAll(
+        DEFAULT_MIGRATION_RULES.addAll(
                 Arrays.asList(
                         // Java assert statement
                         new JavaAssertFallback(),
@@ -82,25 +85,25 @@ public class MigrationMatcher {
         );
     }
 
-    private final List<Migration<?>> supportedMigrations;
+    private final List<MigrationRule<?>> supportedMigrationRules;
 
-    public MigrationMatcher() {
-        this(DEFAULT_MIGRATIONS);
+    public MigrationRules() {
+        this(DEFAULT_MIGRATION_RULES);
     }
 
-    private MigrationMatcher(List<Migration<?>> supportedMigrations) {
-        this.supportedMigrations = supportedMigrations;
+    private MigrationRules(List<MigrationRule<?>> supportedMigrationRules) {
+        this.supportedMigrationRules = supportedMigrationRules;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Map.Entry<Migration<Node>, Node>> match(Node rootNodeToMatch) {
-        List<Map.Entry<Migration<Node>, Node>> matchedMigrationsForCompilationUnit = new ArrayList<>();
+    public List<Map.Entry<MigrationRule<Node>, Node>> match(Node rootNodeToMatch) {
+        List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrationsForCompilationUnit = new ArrayList<>();
 
-        Map<Class, List<Migration<?>>> nodesToMatch = supportedMigrations
+        Map<Class, List<MigrationRule<?>>> nodesToMatch = supportedMigrationRules
                 .stream()
-                .collect(Collectors.groupingBy(Migration::matchedNode));
+                .collect(Collectors.groupingBy(MigrationRule::matchedNode));
 
-        for (Map.Entry<Class, List<Migration<?>>> entry : nodesToMatch.entrySet()) {
+        for (Map.Entry<Class, List<MigrationRule<?>>> entry : nodesToMatch.entrySet()) {
             List<Node> nodes = rootNodeToMatch.findAll(entry.getKey());
 
             for (Node node : nodes) {
@@ -108,7 +111,7 @@ public class MigrationMatcher {
                         .stream()
                         .filter(migration -> {
                             try {
-                                return ((Migration<Node>) migration).matches(node);
+                                return ((MigrationRule<Node>) migration).predicate().test(node);
                             } catch (Throwable e) {
                                 throw new RuntimeException(
                                         String.format("Error while trying to match migration '%s' on code:\n%s", migration, node.toString()), e);
@@ -116,7 +119,7 @@ public class MigrationMatcher {
                         })
                         .findFirst()
                         .ifPresent(migration ->
-                                matchedMigrationsForCompilationUnit.add(new AbstractMap.SimpleImmutableEntry<>(((Migration<Node>) migration), node)));
+                                matchedMigrationsForCompilationUnit.add(new AbstractMap.SimpleImmutableEntry<>(((MigrationRule<Node>) migration), node)));
             }
         }
 

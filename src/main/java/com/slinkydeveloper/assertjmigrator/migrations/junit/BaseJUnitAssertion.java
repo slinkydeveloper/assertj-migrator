@@ -2,7 +2,7 @@ package com.slinkydeveloper.assertjmigrator.migrations.junit;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationMatchingExpressionPredicate;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
@@ -15,7 +15,7 @@ import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
 /**
  * This abstract class contains the logic for handling most of JUnit 4/5 assertions, including the message.
  */
-public abstract class BaseJUnitAssertion implements MigrationMatchingExpressionPredicate<MethodCallExpr> {
+public abstract class BaseJUnitAssertion implements MigrationRule<MethodCallExpr> {
 
     protected abstract String assertionName();
 

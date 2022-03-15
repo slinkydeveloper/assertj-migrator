@@ -2,7 +2,7 @@ package com.slinkydeveloper.assertjmigrator.migrations.hamcrest;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationMatchingExpressionPredicate;
+import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
 
-public abstract class BaseHamcrestAssertThat implements MigrationMatchingExpressionPredicate<MethodCallExpr> {
+public abstract class BaseHamcrestAssertThat implements MigrationRule<MethodCallExpr> {
 
     abstract String matcherName();
 

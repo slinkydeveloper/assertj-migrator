@@ -21,13 +21,12 @@ package com.slinkydeveloper.assertjmigrator;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.migrations.MigrationRules;
+import com.slinkydeveloper.assertjmigrator.migrations.NodeMatch;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
@@ -87,13 +86,13 @@ public class MigrationRulesTests {
             Statement inputStatement = inputMd.getBody().get().getStatements().get(0);
             Statement expectedStatement = expectedMd.getBody().get().getStatements().get(0);
 
-            List<Map.Entry<MigrationRule<Node>, Node>> matchResults = DEFAULT_MIGRATION_SET.match(inputStatement);
+            List<NodeMatch> matchResults = DEFAULT_MIGRATION_SET.findMatches(inputStatement);
             assertThat(matchResults)
                     .as("Expecting one migration")
                     .hasSize(1);
 
             // Note that this mutates the inputMd
-            matchResults.get(0).getKey().migrate(matchResults.get(0).getValue());
+            matchResults.get(0).executeMigration();
 
             assertThat(inputMd.getBody().get().getStatements()).hasSize(1);
             assertThat(inputMd.getBody().get().getStatements().get(0)).isEqualTo(expectedStatement);

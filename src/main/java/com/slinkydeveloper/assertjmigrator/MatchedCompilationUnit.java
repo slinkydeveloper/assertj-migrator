@@ -2,21 +2,19 @@ package com.slinkydeveloper.assertjmigrator;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Name;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
+import com.slinkydeveloper.assertjmigrator.migrations.NodeMatch;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 public class MatchedCompilationUnit {
 
     private final Path path;
     private final CompilationUnit compilationUnit;
-    private final List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrations;
+    private final List<NodeMatch> matchedMigrations;
 
-    public MatchedCompilationUnit(Path path, CompilationUnit compilationUnit, List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrations) {
+    public MatchedCompilationUnit(Path path, CompilationUnit compilationUnit, List<NodeMatch> matchedMigrations) {
         this.path = path;
         this.compilationUnit = compilationUnit;
         this.matchedMigrations = matchedMigrations;
@@ -30,7 +28,7 @@ public class MatchedCompilationUnit {
         return compilationUnit;
     }
 
-    public List<Map.Entry<MigrationRule<Node>, Node>> getMatchedMigrations() {
+    public List<NodeMatch> getMatchedMigrations() {
         return matchedMigrations;
     }
 
@@ -40,16 +38,16 @@ public class MatchedCompilationUnit {
     public void migrate() {
         getMatchedMigrations().forEach(migrationEntry -> {
             try {
-                migrationEntry.getKey().migrate(migrationEntry.getValue());
+                migrationEntry.executeMigration();
             } catch (Throwable e) {
                 throw new RuntimeException(
-                        String.format("Error while trying to execute migration '%s' in file '%s' on code:\n%s", migrationEntry.getKey(), path, migrationEntry.getValue().toString()), e);
+                        String.format("Error while trying to execute migration '%s' in file '%s' on code:\n%s", migrationEntry.toString(), path, migrationEntry.getNode()), e);
             }
         });
 
         getMatchedMigrations()
                 .stream()
-                .flatMap(migrationEntry -> migrationEntry.getKey().requiredImports().stream())
+                .flatMap(migrationEntry -> migrationEntry.getRequiredImports().stream())
                 .distinct()
                 .forEach(methodIdentifier -> addStaticImport(compilationUnit, methodIdentifier));
 

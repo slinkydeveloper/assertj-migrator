@@ -85,30 +85,24 @@ public class MigrationRules {
         );
     }
 
-    private final List<MigrationRule<?>> supportedMigrationRules;
+    private final Map<Class<? extends Node>, List<MigrationRule<? extends Node>>> nodeClassToRules;
 
     public MigrationRules() {
         this(DEFAULT_MIGRATION_RULES);
     }
 
-    private MigrationRules(List<MigrationRule<?>> supportedMigrationRules) {
-        this.supportedMigrationRules = supportedMigrationRules;
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Map.Entry<MigrationRule<Node>, Node>> match(Node rootNodeToMatch) {
-        List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrationsForCompilationUnit = new ArrayList<>();
-
-        Map<Class, List<MigrationRule<?>>> nodesToMatch = supportedMigrationRules
+    private MigrationRules(List<MigrationRule<?>> rules) {
+        this.nodeClassToRules = rules
                 .stream()
                 .collect(Collectors.groupingBy(MigrationRule::matchedNode));
+    }
 
-        for (Map.Entry<Class, List<MigrationRule<?>>> entry : nodesToMatch.entrySet()) {
-            List<Node> nodes = rootNodeToMatch.findAll(entry.getKey());
-
-            for (Node node : nodes) {
-                entry.getValue()
-                        .stream()
+    @SuppressWarnings({"unchecked"})
+    public List<NodeMatch> findMatches(Node rootNodeToMatch) {
+        return nodeClassToRules.keySet()
+                .stream()
+                .flatMap(nodeClazz -> rootNodeToMatch.findAll(nodeClazz).stream())
+                .flatMap(node -> nodeClassToRules.get(node.getClass()).stream()
                         .filter(migration -> {
                             try {
                                 return ((MigrationRule<Node>) migration).predicate().test(node);
@@ -118,12 +112,14 @@ public class MigrationRules {
                             }
                         })
                         .findFirst()
-                        .ifPresent(migration ->
-                                matchedMigrationsForCompilationUnit.add(new AbstractMap.SimpleImmutableEntry<>(((MigrationRule<Node>) migration), node)));
-            }
-        }
-
-        return matchedMigrationsForCompilationUnit;
+                        .map(rule -> new NodeMatch(
+                                node,
+                                () -> ((MigrationRule<Node>) rule).migrate(node),
+                                rule.toString(),
+                                new HashSet<>(rule.requiredImports())
+                        ))
+                        .stream()
+                ).collect(Collectors.toList());
     }
 
 

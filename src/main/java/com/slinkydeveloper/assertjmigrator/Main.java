@@ -11,8 +11,8 @@ import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
-import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.migrations.MigrationRules;
+import com.slinkydeveloper.assertjmigrator.migrations.NodeMatch;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -91,7 +91,7 @@ public class Main implements Callable<Integer> {
         CompilationUnit cu = parseResult.getResult().get();
         CompilationUnit originalCu = cu.clone();
 
-        List<Map.Entry<MigrationRule<Node>, Node>> matchedMigrationsForCompilationUnit = migrationRules.match(cu);
+        List<NodeMatch> matchedMigrationsForCompilationUnit = migrationRules.findMatches(cu);
         if (matchedMigrationsForCompilationUnit.isEmpty()) {
             return;
         }
@@ -102,7 +102,7 @@ public class Main implements Callable<Integer> {
             System.out.println("--- " + match.getPath());
             match.getMatchedMigrations()
                     .stream()
-                    .collect(Collectors.groupingBy(Map.Entry::getKey))
+                    .collect(Collectors.groupingBy(NodeMatch::getDescription))
                     .forEach((migration, entry) -> System.out.println(migration + ": " + entry.size()));
             System.out.println();
         }

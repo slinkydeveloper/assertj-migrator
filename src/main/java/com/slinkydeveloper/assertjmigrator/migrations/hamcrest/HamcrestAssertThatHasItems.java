@@ -6,24 +6,24 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatHasItems extends BaseHamcrestAssertThat {
 
-    @Override
-    String matcherName() {
-        return "hasItems";
-    }
+  @Override
+  String matcherName() {
+    return "hasItems";
+  }
 
-    @Override
-    boolean matcherVariadic() {
-        return true;
-    }
+  @Override
+  boolean matcherVariadic() {
+    return true;
+  }
 
-    @Override
-    int matcherArity() {
-        return 0;
-    }
+  @Override
+  int matcherArity() {
+    return 0;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).contains(matcher.getArguments());
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).contains(matcher.getArguments());
+  }
 
 }

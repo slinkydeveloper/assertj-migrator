@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatNotInstanceOf extends BaseHamcrestAssertThatNot {
 
-    @Override
-    String matcherName() {
-        return "instanceOf";
-    }
+  @Override
+  String matcherName() {
+    return "instanceOf";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).isNotInstanceOf(matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).isNotInstanceOf(matcher.getArgument(0));
+  }
 
 }

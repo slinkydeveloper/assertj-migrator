@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatStartsWith extends BaseHamcrestAssertThat {
 
-    @Override
-    String matcherName() {
-        return "startsWith";
-    }
+  @Override
+  String matcherName() {
+    return "startsWith";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).startsWith(matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).startsWith(matcher.getArgument(0));
+  }
 
 }

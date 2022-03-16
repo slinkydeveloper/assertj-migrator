@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatGreaterThan extends BaseHamcrestAssertThat {
 
-    @Override
-    String matcherName() {
-        return "greaterThan";
-    }
+  @Override
+  String matcherName() {
+    return "greaterThan";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).isGreaterThan(matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).isGreaterThan(matcher.getArgument(0));
+  }
 
 }

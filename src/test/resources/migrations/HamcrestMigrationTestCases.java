@@ -1,407 +1,402 @@
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.assertj.core.api.Assertions.fail;
-
-import static org.junit.Assert.assertThat;
-
-import static org.hamcrest.Matchers.*;
-
 public class HamcrestMigrationTestCases {
 
-    Object x = new Object();
-    Class xClass = Object.class;
-    Object y = new Object();
-
-    Object[] xArray = new Object[]{};
-    Object[] yArray = new Object[]{};
-
-    List<Object> xList = new ArrayList<>();
-
-    Boolean xBoolean = false;
-    Float xFloat = 10f;
-    Float yFloat = 10f;
-    float deltaFloat = 10f;
-    Double xDouble = 10d;
-    Double yDouble = 10d;
-    double deltaDouble = 10d;
-
-    boolean b = true;
-
-    Matcher<?> myMatcher = new BaseMatcher<Iterable<? super Object>>() {
-        @Override
-        public boolean matches(Object o) {
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {}
-    };
-
-    // Assert is/isEqualTo/not is/not is equal to
-    
-    void assertIs_input() {
-        assertThat(x, is(y));
-    }
+  Object x = new Object();
+  Class xClass = Object.class;
+  Object y = new Object();
 
-    void assertIs_expected() {
-        assertThat(x).isEqualTo(y);
-    }
+  Object[] xArray = new Object[] {};
+  Object[] yArray = new Object[] {};
 
-    void assertIsWithMessage_input() {
-        assertThat("some msg", x, is(y));
-    }
+  List<Object> xList = new ArrayList<>();
 
-    void assertIsWithMessage_expected() {
-        assertThat(x).as("some msg").isEqualTo(y);
-    }
+  Boolean xBoolean = false;
+  Float xFloat = 10f;
+  Float yFloat = 10f;
+  float deltaFloat = 10f;
+  Double xDouble = 10d;
+  Double yDouble = 10d;
+  double deltaDouble = 10d;
 
-    void assertIsAllStringsWithMessage_input() {
-        assertThat("some msg", "x", is("y"));
-    }
+  boolean b = true;
 
-    void assertIsAllStringsWithMessage_expected() {
-        assertThat("x").as("some msg").isEqualTo("y");
+  Matcher<?> myMatcher = new BaseMatcher<Iterable<? super Object>>() {
+    @Override
+    public boolean matches(Object o) {
+      return true;
     }
 
-    void assertNotIs_input() {
-        assertThat(x, not(is(y)));
-    }
+    @Override
+    public void describeTo(Description description) {}
+  };
 
-    void assertNotIs_expected() {
-        assertThat(x).isNotEqualTo(y);
-    }
+  // Assert is/isEqualTo/not is/not is equal to
 
-    void assertNotIsWithMessage_input() {
-        assertThat("some msg", x, not(is(y)));
-    }
+  void assertIs_input() {
+    assertThat(x, is(y));
+  }
 
-    void assertNotIsWithMessage_expected() {
-        assertThat(x).as("some msg").isNotEqualTo(y);
-    }
+  void assertIs_expected() {
+    assertThat(x).isEqualTo(y);
+  }
 
-    void assertIsEqualTo_input() {
-        assertThat(x, equalTo(y));
-    }
+  void assertIsWithMessage_input() {
+    assertThat("some msg", x, is(y));
+  }
 
-    void assertIsEqualTo_expected() {
-        assertThat(x).isEqualTo(y);
-    }
+  void assertIsWithMessage_expected() {
+    assertThat(x).as("some msg").isEqualTo(y);
+  }
 
-    void assertIsEqualToWithMessage_input() {
-        assertThat("some msg", x, equalTo(y));
-    }
+  void assertIsAllStringsWithMessage_input() {
+    assertThat("some msg", "x", is("y"));
+  }
 
-    void assertIsEqualToWithMessage_expected() {
-        assertThat(x).as("some msg").isEqualTo(y);
-    }
+  void assertIsAllStringsWithMessage_expected() {
+    assertThat("x").as("some msg").isEqualTo("y");
+  }
 
-    void assertIsEqualToAllStringsWithMessage_input() {
-        assertThat("some msg", "x", equalTo("y"));
-    }
+  void assertNotIs_input() {
+    assertThat(x, not(is(y)));
+  }
 
-    void assertIsEqualToAllStringsWithMessage_expected() {
-        assertThat("x").as("some msg").isEqualTo("y");
-    }
+  void assertNotIs_expected() {
+    assertThat(x).isNotEqualTo(y);
+  }
 
-    void assertNotIsEqualTo_input() {
-        assertThat(x, not(equalTo(y)));
-    }
+  void assertNotIsWithMessage_input() {
+    assertThat("some msg", x, not(is(y)));
+  }
 
-    void assertNotIsEqualTo_expected() {
-        assertThat(x).isNotEqualTo(y);
-    }
+  void assertNotIsWithMessage_expected() {
+    assertThat(x).as("some msg").isNotEqualTo(y);
+  }
 
-    void assertNotIsEqualToWithMessage_input() {
-        assertThat("some msg", x, not(equalTo(y)));
-    }
+  void assertIsEqualTo_input() {
+    assertThat(x, equalTo(y));
+  }
 
-    void assertNotIsEqualToWithMessage_expected() {
-        assertThat(x).as("some msg").isNotEqualTo(y);
-    }
+  void assertIsEqualTo_expected() {
+    assertThat(x).isEqualTo(y);
+  }
 
-    // Assert null/not null
+  void assertIsEqualToWithMessage_input() {
+    assertThat("some msg", x, equalTo(y));
+  }
 
-    void assertNullValue_input() {
-        assertThat(x, nullValue());
-    }
+  void assertIsEqualToWithMessage_expected() {
+    assertThat(x).as("some msg").isEqualTo(y);
+  }
 
-    void assertNullValue_expected() {
-        assertThat(x).isNull();
-    }
+  void assertIsEqualToAllStringsWithMessage_input() {
+    assertThat("some msg", "x", equalTo("y"));
+  }
 
-    void assertNullValueWithMessage_input() {
-        assertThat("some msg", x, nullValue());
-    }
+  void assertIsEqualToAllStringsWithMessage_expected() {
+    assertThat("x").as("some msg").isEqualTo("y");
+  }
 
-    void assertNullValueWithMessage_expected() {
-        assertThat(x).as("some msg").isNull();
-    }
+  void assertNotIsEqualTo_input() {
+    assertThat(x, not(equalTo(y)));
+  }
 
-    void assertNotNullValue_input() {
-        assertThat(x, notNullValue());
-    }
+  void assertNotIsEqualTo_expected() {
+    assertThat(x).isNotEqualTo(y);
+  }
 
-    void assertNotNullValue_expected() {
-        assertThat(x).isNotNull();
-    }
+  void assertNotIsEqualToWithMessage_input() {
+    assertThat("some msg", x, not(equalTo(y)));
+  }
 
-    void assertNotNullValueWithMessage_input() {
-        assertThat("some msg", x, not(nullValue()));
-    }
+  void assertNotIsEqualToWithMessage_expected() {
+    assertThat(x).as("some msg").isNotEqualTo(y);
+  }
 
-    void assertNotNullValueWithMessage_expected() {
-        assertThat(x).as("some msg").isNotNull();
-    }
+  // Assert null/not null
 
-    void assertNotNullValueNested_input() {
-        assertThat(x, notNullValue());
-    }
+  void assertNullValue_input() {
+    assertThat(x, nullValue());
+  }
 
-    void assertNotNullValueNested_expected() {
-        assertThat(x).isNotNull();
-    }
+  void assertNullValue_expected() {
+    assertThat(x).isNull();
+  }
 
-    void assertNotNullValueNestedWithMessage_input() {
-        assertThat("some msg", x, not(nullValue()));
-    }
+  void assertNullValueWithMessage_input() {
+    assertThat("some msg", x, nullValue());
+  }
 
-    void assertNotNullValueNestedWithMessage_expected() {
-        assertThat(x).as("some msg").isNotNull();
-    }
+  void assertNullValueWithMessage_expected() {
+    assertThat(x).as("some msg").isNull();
+  }
 
-    // Assert same instance/not same instance
+  void assertNotNullValue_input() {
+    assertThat(x, notNullValue());
+  }
 
-    void assertSameInstance_input() {
-        assertThat(x, sameInstance(y));
-    }
+  void assertNotNullValue_expected() {
+    assertThat(x).isNotNull();
+  }
 
-    void assertSameInstance_expected() {
-        assertThat(x).isSameAs(y);
-    }
+  void assertNotNullValueWithMessage_input() {
+    assertThat("some msg", x, not(nullValue()));
+  }
 
-    void assertSameInstanceWithMessage_input() {
-        assertThat("some msg", x, sameInstance(y));
-    }
+  void assertNotNullValueWithMessage_expected() {
+    assertThat(x).as("some msg").isNotNull();
+  }
 
-    void assertSameInstanceWithMessage_expected() {
-        assertThat(x).as("some msg").isSameAs(y);
-    }
+  void assertNotNullValueNested_input() {
+    assertThat(x, notNullValue());
+  }
 
-    void assertNotSameInstance_input() {
-        assertThat(x, not(sameInstance(y)));
-    }
+  void assertNotNullValueNested_expected() {
+    assertThat(x).isNotNull();
+  }
 
-    void assertNotSameInstance_expected() {
-        assertThat(x).isNotSameAs(y);
-    }
+  void assertNotNullValueNestedWithMessage_input() {
+    assertThat("some msg", x, not(nullValue()));
+  }
 
-    void assertNotSameInstanceWithMessage_input() {
-        assertThat("some msg", x, not(sameInstance(y)));
-    }
+  void assertNotNullValueNestedWithMessage_expected() {
+    assertThat(x).as("some msg").isNotNull();
+  }
 
-    void assertNotSameInstanceWithMessage_expected() {
-        assertThat(x).as("some msg").isNotSameAs(y);
-    }
+  // Assert same instance/not same instance
 
-    // Assert instanceOf/not instance of
+  void assertSameInstance_input() {
+    assertThat(x, sameInstance(y));
+  }
 
-    void assertInstanceOfWithClassLiteral_input() {
-        assertThat(x, instanceOf(Object.class));
-    }
+  void assertSameInstance_expected() {
+    assertThat(x).isSameAs(y);
+  }
 
-    void assertInstanceOfWithClassLiteral_expected() {
-        assertThat(x).isInstanceOf(Object.class);
-    }
+  void assertSameInstanceWithMessage_input() {
+    assertThat("some msg", x, sameInstance(y));
+  }
 
-    void assertInstanceOfWithClassLiteralWithMessage_input() {
-        assertThat("some msg", x, instanceOf(Object.class));
-    }
+  void assertSameInstanceWithMessage_expected() {
+    assertThat(x).as("some msg").isSameAs(y);
+  }
 
-    void assertInstanceOfWithClassLiteralWithMessage_expected() {
-        assertThat(x).as("some msg").isInstanceOf(Object.class);
-    }
+  void assertNotSameInstance_input() {
+    assertThat(x, not(sameInstance(y)));
+  }
 
-    void assertInstanceOfWithClassVariable_input() {
-        assertThat(x, instanceOf(xClass));
-    }
+  void assertNotSameInstance_expected() {
+    assertThat(x).isNotSameAs(y);
+  }
 
-    void assertInstanceOfWithClassVariable_expected() {
-        assertThat(x).isInstanceOf(xClass);
-    }
+  void assertNotSameInstanceWithMessage_input() {
+    assertThat("some msg", x, not(sameInstance(y)));
+  }
 
-    void assertInstanceOfWithClassVariableWithMessage_input() {
-        assertThat("some msg", x, instanceOf(xClass));
-    }
+  void assertNotSameInstanceWithMessage_expected() {
+    assertThat(x).as("some msg").isNotSameAs(y);
+  }
 
-    void assertInstanceOfWithClassVariableWithMessage_expected() {
-        assertThat(x).as("some msg").isInstanceOf(xClass);
-    }
+  // Assert instanceOf/not instance of
 
-    void assertNotInstanceOfWithClassLiteral_input() {
-        assertThat(x, not(instanceOf(Object.class)));
-    }
+  void assertInstanceOfWithClassLiteral_input() {
+    assertThat(x, instanceOf(Object.class));
+  }
 
-    void assertNotInstanceOfWithClassLiteral_expected() {
-        assertThat(x).isNotInstanceOf(Object.class);
-    }
+  void assertInstanceOfWithClassLiteral_expected() {
+    assertThat(x).isInstanceOf(Object.class);
+  }
 
-    void assertNotInstanceOfWithClassLiteralWithMessage_input() {
-        assertThat("some msg", x, not(instanceOf(Object.class)));
-    }
+  void assertInstanceOfWithClassLiteralWithMessage_input() {
+    assertThat("some msg", x, instanceOf(Object.class));
+  }
 
-    void assertNotInstanceOfWithClassLiteralWithMessage_expected() {
-        assertThat(x).as("some msg").isNotInstanceOf(Object.class);
-    }
+  void assertInstanceOfWithClassLiteralWithMessage_expected() {
+    assertThat(x).as("some msg").isInstanceOf(Object.class);
+  }
 
-    void assertNotInstanceOfWithClassVariable_input() {
-        assertThat(x, not(instanceOf(xClass)));
-    }
+  void assertInstanceOfWithClassVariable_input() {
+    assertThat(x, instanceOf(xClass));
+  }
 
-    void assertNotInstanceOfWithClassVariable_expected() {
-        assertThat(x).isNotInstanceOf(xClass);
-    }
+  void assertInstanceOfWithClassVariable_expected() {
+    assertThat(x).isInstanceOf(xClass);
+  }
 
-    void assertNotInstanceOfWithClassVariableWithMessage_input() {
-        assertThat("some msg", x, not(instanceOf(xClass)));
-    }
+  void assertInstanceOfWithClassVariableWithMessage_input() {
+    assertThat("some msg", x, instanceOf(xClass));
+  }
 
-    void assertNotInstanceOfWithClassVariableWithMessage_expected() {
-        assertThat(x).as("some msg").isNotInstanceOf(xClass);
-    }
+  void assertInstanceOfWithClassVariableWithMessage_expected() {
+    assertThat(x).as("some msg").isInstanceOf(xClass);
+  }
 
-    // Assert less/less or equal/greater/greater or equal
+  void assertNotInstanceOfWithClassLiteral_input() {
+    assertThat(x, not(instanceOf(Object.class)));
+  }
 
-    void assertLess_input() {
-        assertThat(xFloat, lessThan(yFloat));
-    }
+  void assertNotInstanceOfWithClassLiteral_expected() {
+    assertThat(x).isNotInstanceOf(Object.class);
+  }
 
-    void assertLess_expected() {
-        assertThat(xFloat).isLessThan(yFloat);
-    }
+  void assertNotInstanceOfWithClassLiteralWithMessage_input() {
+    assertThat("some msg", x, not(instanceOf(Object.class)));
+  }
 
-    void assertLessOrEqual_input() {
-        assertThat(xFloat, lessThanOrEqualTo(yFloat));
-    }
+  void assertNotInstanceOfWithClassLiteralWithMessage_expected() {
+    assertThat(x).as("some msg").isNotInstanceOf(Object.class);
+  }
 
-    void assertLessOrEqual_expected() {
-        assertThat(xFloat).isLessThanOrEqualTo(yFloat);
-    }
+  void assertNotInstanceOfWithClassVariable_input() {
+    assertThat(x, not(instanceOf(xClass)));
+  }
 
-    void assertGreater_input() {
-        assertThat(xFloat, greaterThan(yFloat));
-    }
+  void assertNotInstanceOfWithClassVariable_expected() {
+    assertThat(x).isNotInstanceOf(xClass);
+  }
 
-    void assertGreater_expected() {
-        assertThat(xFloat).isGreaterThan(yFloat);
-    }
+  void assertNotInstanceOfWithClassVariableWithMessage_input() {
+    assertThat("some msg", x, not(instanceOf(xClass)));
+  }
 
-    void assertGreaterOrEqual_input() {
-        assertThat(xFloat, greaterThanOrEqualTo(yFloat));
-    }
+  void assertNotInstanceOfWithClassVariableWithMessage_expected() {
+    assertThat(x).as("some msg").isNotInstanceOf(xClass);
+  }
 
-    void assertGreaterOrEqual_expected() {
-        assertThat(xFloat).isGreaterThanOrEqualTo(yFloat);
-    }
-    
-    // Assert has item/has itmes/not has item/not has items
-
-    void assertHasItem_input() {
-        assertThat(xList, hasItem(y));
-    }
+  // Assert less/less or equal/greater/greater or equal
 
-    void assertHasItem_expected() {
-        assertThat(xList).contains(y);
-    }
+  void assertLess_input() {
+    assertThat(xFloat, lessThan(yFloat));
+  }
 
-    void assertNotHasItem_input() {
-        assertThat(xList, not(hasItem(y)));
-    }
+  void assertLess_expected() {
+    assertThat(xFloat).isLessThan(yFloat);
+  }
 
-    void assertNotHasItem_expected() {
-        assertThat(xList).doesNotContain(y);
-    }
+  void assertLessOrEqual_input() {
+    assertThat(xFloat, lessThanOrEqualTo(yFloat));
+  }
 
-    void assertHasItems_input() {
-        assertThat(xList, hasItems(x, y));
-    }
+  void assertLessOrEqual_expected() {
+    assertThat(xFloat).isLessThanOrEqualTo(yFloat);
+  }
 
-    void assertHasItems_expected() {
-        assertThat(xList).contains(x, y);
-    }
+  void assertGreater_input() {
+    assertThat(xFloat, greaterThan(yFloat));
+  }
 
-    void assertNotHasItems_input() {
-        assertThat(xList, not(hasItems(x, y)));
-    }
+  void assertGreater_expected() {
+    assertThat(xFloat).isGreaterThan(yFloat);
+  }
 
-    void assertNotHasItems_expected() {
-        assertThat(xList).doesNotContain(x, y);
-    }
+  void assertGreaterOrEqual_input() {
+    assertThat(xFloat, greaterThanOrEqualTo(yFloat));
+  }
 
-    // Assert contains string/not contains string/starts with/not starts with/ends with/not ends with
+  void assertGreaterOrEqual_expected() {
+    assertThat(xFloat).isGreaterThanOrEqualTo(yFloat);
+  }
 
-    void assertContainsString_input() {
-        assertThat("abc", containsString("b"));
-    }
+  // Assert has item/has itmes/not has item/not has items
 
-    void assertContainsString_expected() {
-        assertThat("abc").contains("b");
-    }
+  void assertHasItem_input() {
+    assertThat(xList, hasItem(y));
+  }
 
-    void assertNotContainsString_input() {
-        assertThat("abc", not(containsString("d")));
-    }
+  void assertHasItem_expected() {
+    assertThat(xList).contains(y);
+  }
 
-    void assertNotContainsString_expected() {
-        assertThat("abc").doesNotContain("d");
-    }
+  void assertNotHasItem_input() {
+    assertThat(xList, not(hasItem(y)));
+  }
 
-    void assertStartsWith_input() {
-        assertThat("abc", startsWith("a"));
-    }
+  void assertNotHasItem_expected() {
+    assertThat(xList).doesNotContain(y);
+  }
 
-    void assertStartsWith_expected() {
-        assertThat("abc").startsWith("a");
-    }
+  void assertHasItems_input() {
+    assertThat(xList, hasItems(x, y));
+  }
 
-    void assertNotStartsWith_input() {
-        assertThat("abc", not(startsWith("b")));
-    }
+  void assertHasItems_expected() {
+    assertThat(xList).contains(x, y);
+  }
 
-    void assertNotStartsWith_expected() {
-        assertThat("abc").doesNotStartWith("b");
-    }
+  void assertNotHasItems_input() {
+    assertThat(xList, not(hasItems(x, y)));
+  }
 
-    void assertEndsWith_input() {
-        assertThat("abc", endsWith("c"));
-    }
+  void assertNotHasItems_expected() {
+    assertThat(xList).doesNotContain(x, y);
+  }
 
-    void assertEndsWith_expected() {
-        assertThat("abc").endsWith("c");
-    }
+  // Assert contains string/not contains string/starts with/not starts with/ends with/not ends with
 
-    void assertNotEndsWith_input() {
-        assertThat("abc", not(endsWith("b")));
-    }
+  void assertContainsString_input() {
+    assertThat("abc", containsString("b"));
+  }
 
-    void assertNotEndsWith_expected() {
-        assertThat("abc").doesNotEndWith("b");
-    }
-    
-    // Fallback
-
-    void assertFallback_input() {
-        assertThat(xList, allOf(hasItem(x), myMatcher));
-    }
+  void assertContainsString_expected() {
+    assertThat("abc").contains("b");
+  }
 
-    void assertFallback_expected() {
-        assertThat(xList).satisfies(matching(allOf(hasItem(x), myMatcher)));
-    }
+  void assertNotContainsString_input() {
+    assertThat("abc", not(containsString("d")));
+  }
+
+  void assertNotContainsString_expected() {
+    assertThat("abc").doesNotContain("d");
+  }
+
+  void assertStartsWith_input() {
+    assertThat("abc", startsWith("a"));
+  }
+
+  void assertStartsWith_expected() {
+    assertThat("abc").startsWith("a");
+  }
+
+  void assertNotStartsWith_input() {
+    assertThat("abc", not(startsWith("b")));
+  }
+
+  void assertNotStartsWith_expected() {
+    assertThat("abc").doesNotStartWith("b");
+  }
+
+  void assertEndsWith_input() {
+    assertThat("abc", endsWith("c"));
+  }
+
+  void assertEndsWith_expected() {
+    assertThat("abc").endsWith("c");
+  }
+
+  void assertNotEndsWith_input() {
+    assertThat("abc", not(endsWith("b")));
+  }
+
+  void assertNotEndsWith_expected() {
+    assertThat("abc").doesNotEndWith("b");
+  }
+
+  // Fallback
+
+  void assertFallback_input() {
+    assertThat(xList, allOf(hasItem(x), myMatcher));
+  }
+
+  void assertFallback_expected() {
+    assertThat(xList).satisfies(matching(allOf(hasItem(x), myMatcher)));
+  }
 
 }

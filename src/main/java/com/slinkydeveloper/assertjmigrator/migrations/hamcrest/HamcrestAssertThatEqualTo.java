@@ -7,19 +7,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatEqualTo extends BaseHamcrestAssertThat {
 
-    @Override
-    String matcherName() {
-        return "equalTo";
-    }
+  @Override
+  String matcherName() {
+    return "equalTo";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        EqualityMigrator.migrateEquals(builder, actual, matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    EqualityMigrator.migrateEquals(builder, actual, matcher.getArgument(0));
+  }
 
 }

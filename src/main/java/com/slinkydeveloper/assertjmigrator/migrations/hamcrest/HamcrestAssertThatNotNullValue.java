@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatNotNullValue extends BaseHamcrestAssertThat {
 
-    @Override
-    String matcherName() {
-        return "notNullValue";
-    }
+  @Override
+  String matcherName() {
+    return "notNullValue";
+  }
 
-    @Override
-    int matcherArity() {
-        return 0;
-    }
+  @Override
+  int matcherArity() {
+    return 0;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).isNotNull();
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).isNotNull();
+  }
 
 }

@@ -7,19 +7,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatNotIs extends BaseHamcrestAssertThatNot {
 
-    @Override
-    String matcherName() {
-        return "is";
-    }
+  @Override
+  String matcherName() {
+    return "is";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        EqualityMigrator.migrateNotEquals(builder, actual, matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    EqualityMigrator.migrateNotEquals(builder, actual, matcher.getArgument(0));
+  }
 
 }

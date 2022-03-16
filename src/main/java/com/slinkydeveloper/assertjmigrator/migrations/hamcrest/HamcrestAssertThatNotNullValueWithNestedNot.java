@@ -4,21 +4,24 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
+/**
+ * {@code assertThat(actual, not(nullValue))}
+ */
 public class HamcrestAssertThatNotNullValueWithNestedNot extends BaseHamcrestAssertThatNot {
 
-    @Override
-    String matcherName() {
-        return "nullValue";
-    }
+  @Override
+  String matcherName() {
+    return "nullValue";
+  }
 
-    @Override
-    int matcherArity() {
-        return 0;
-    }
+  @Override
+  int matcherArity() {
+    return 0;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).isNotNull();
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).isNotNull();
+  }
 
 }

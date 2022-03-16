@@ -5,19 +5,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class JUnitAssertNotSame extends BaseJUnitAssertion {
 
-    @Override
-    protected String assertionName() {
-        return "assertNotSame";
-    }
+  @Override
+  protected String assertionName() {
+    return "assertNotSame";
+  }
 
-    @Override
-    protected int assertionArity() {
-        return 2;
-    }
+  @Override
+  protected int assertionArity() {
+    return 2;
+  }
 
-    @Override
-    protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
-        builder.assertThat(expr.getArgument(1)).isNotSameAs(expr.getArgument(0));
-    }
+  @Override
+  protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
+    builder.assertThat(expr.getArgument(1)).isNotSameAs(expr.getArgument(0));
+  }
 
 }

@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatNotEndsWith extends BaseHamcrestAssertThatNot {
 
-    @Override
-    String matcherName() {
-        return "endsWith";
-    }
+  @Override
+  String matcherName() {
+    return "endsWith";
+  }
 
-    @Override
-    int matcherArity() {
-        return 1;
-    }
+  @Override
+  int matcherArity() {
+    return 1;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).doesNotEndWith(matcher.getArgument(0));
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).doesNotEndWith(matcher.getArgument(0));
+  }
 
 }

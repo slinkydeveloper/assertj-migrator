@@ -1,108 +1,105 @@
 package com.slinkydeveloper.assertjmigrator.migrations.junit;
 
+import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.slinkydeveloper.assertjmigrator.migrations.MigrationRule;
 import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 import com.slinkydeveloper.assertjmigrator.nodes.Predicates;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-
-import static com.slinkydeveloper.assertjmigrator.nodes.Predicates.*;
-
 /**
  * This abstract class contains the logic for handling most of JUnit 4/5 assertions, including the message.
  */
 public abstract class BaseJUnitAssertion implements MigrationRule<MethodCallExpr> {
 
-    protected abstract String assertionName();
+  protected abstract String assertionName();
 
-    protected abstract int assertionArity();
+  protected abstract int assertionArity();
 
-    protected abstract void fillBuilder(AssertJBuilder builder, MethodCallExpr expr);
+  protected abstract void fillBuilder(AssertJBuilder builder, MethodCallExpr expr);
 
-    protected Predicate<Expression> additionalPredicate(int offset) {
-        return v -> true;
+  protected Predicate<Expression> additionalPredicate(int offset) {
+    return v -> true;
+  }
+
+  @Override
+  public Class<MethodCallExpr> matchedNode() {
+    return MethodCallExpr.class;
+  }
+
+  @Override
+  public final Predicate<Expression> predicate() {
+    return and(
+               methodNameIs(assertionName()),
+               or(
+                  methodArgsAre(assertionArity()),
+                  and(
+                      methodArgsAre(assertionArity() + 1),
+                      or(
+                         methodArgMatches(0, Predicates::isString),
+                         methodArgMatches(assertionArity(), Predicates::isString)))),
+               matchWithoutMessage());
+  }
+
+  @Override
+  public final void migrate(MethodCallExpr methodCallExpr) {
+    int messageArgumentIndex = messageIndex(methodCallExpr);
+    if (messageArgumentIndex == -1) {
+      AssertJBuilder builder = AssertJBuilder.create();
+      fillBuilder(builder, methodCallExpr);
+      methodCallExpr.replace(builder.build());
+      return;
     }
 
-    @Override
-    public Class<MethodCallExpr> matchedNode() {
-        return MethodCallExpr.class;
+    // We need to extract the message and modify the arguments
+    Expression message = methodCallExpr.getArgument(messageArgumentIndex);
+    methodCallExpr.getArguments().remove(messageArgumentIndex);
+    AssertJBuilder builder = AssertJBuilder.create()
+                                           .as(message);
+    fillBuilder(builder, methodCallExpr);
+    methodCallExpr.replace(builder.build());
+  }
+
+  @Override
+  public List<String> requiredImports() {
+    return Collections.singletonList("org.assertj.core.api.Assertions.assertThat");
+  }
+
+  @Override
+  public String toString() {
+    return "JUnit 4/5 " + assertionName();
+  }
+
+  private int messageIndex(MethodCallExpr methodCallExpr) {
+    if (methodArgsAre(assertionArity() + 1).test(methodCallExpr)) {
+      if (Predicates.isJUnit4Assertion().test(methodCallExpr)) {
+        return 0;
+      }
+      if (Predicates.isJUnit5Assertion().test(methodCallExpr)) {
+        return assertionArity();
+      }
+      throw new IllegalStateException(
+                                      "Expected either a JUnit 4 or JUnit 5 assertion, but none of them matches for expression: "
+                                      + methodCallExpr);
     }
+    return -1;
+  }
 
-    @Override
-    public final Predicate<Expression> predicate() {
-        return and(
-                methodNameIs(assertionName()),
-                or(
-                        methodArgsAre(assertionArity()),
-                        and(
-                                methodArgsAre(assertionArity() + 1),
-                                or(
-                                        methodArgMatches(0, Predicates::isString),
-                                        methodArgMatches(assertionArity(), Predicates::isString)
-                                )
-                        )
-                ),
-                matchWithoutMessage()
-        );
-    }
+  private Predicate<Expression> matchWithoutMessage() {
+    return expression -> {
+      MethodCallExpr methodCallExpr = expression.asMethodCallExpr();
+      int messageArgumentIndex = messageIndex(methodCallExpr);
 
-    @Override
-    public final void migrate(MethodCallExpr methodCallExpr) {
-        int messageArgumentIndex = messageIndex(methodCallExpr);
-        if (messageArgumentIndex == -1) {
-            AssertJBuilder builder = AssertJBuilder.create();
-            fillBuilder(builder, methodCallExpr);
-            methodCallExpr.replace(builder.build());
-            return;
-        }
-
-        // We need to extract the message and modify the arguments
-        Expression message = methodCallExpr.getArgument(messageArgumentIndex);
-        methodCallExpr.getArguments().remove(messageArgumentIndex);
-        AssertJBuilder builder = AssertJBuilder.create()
-                .as(message);
-        fillBuilder(builder, methodCallExpr);
-        methodCallExpr.replace(builder.build());
-    }
-
-    @Override
-    public List<String> requiredImports() {
-        return Collections.singletonList("org.assertj.core.api.Assertions.assertThat");
-    }
-
-    @Override
-    public String toString() {
-        return "JUnit 4/5 " + assertionName();
-    }
-
-    private int messageIndex(MethodCallExpr methodCallExpr) {
-        if (methodArgsAre(assertionArity() + 1).test(methodCallExpr)) {
-            if (Predicates.isJUnit4Assertion().test(methodCallExpr)) {
-                return 0;
-            }
-            if (Predicates.isJUnit5Assertion().test(methodCallExpr)) {
-                return assertionArity();
-            }
-            throw new IllegalStateException(
-                    "Expected either a JUnit 4 or JUnit 5 assertion, but none of them matches for expression: " + methodCallExpr);
-        }
-        return -1;
-    }
-
-    private Predicate<Expression> matchWithoutMessage() {
-        return expression -> {
-            MethodCallExpr methodCallExpr = expression.asMethodCallExpr();
-            int messageArgumentIndex = messageIndex(methodCallExpr);
-
-            if (messageArgumentIndex == -1) {
-                return additionalPredicate(0).test(methodCallExpr);
-            }
-            int offset = messageArgumentIndex == 0 ? 1 : 0;
-            return additionalPredicate(offset).test(methodCallExpr);
-        };
-    }
+      if (messageArgumentIndex == -1) {
+        return additionalPredicate(0).test(methodCallExpr);
+      }
+      int offset = messageArgumentIndex == 0 ? 1 : 0;
+      return additionalPredicate(offset).test(methodCallExpr);
+    };
+  }
 }

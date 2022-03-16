@@ -6,19 +6,19 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class JUnitAssertTrue extends BaseJUnitAssertion {
 
-    @Override
-    protected String assertionName() {
-        return "assertTrue";
-    }
+  @Override
+  protected String assertionName() {
+    return "assertTrue";
+  }
 
-    @Override
-    protected int assertionArity() {
-        return 1;
-    }
+  @Override
+  protected int assertionArity() {
+    return 1;
+  }
 
-    @Override
-    protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
-        PredicateMigrator.migrateTrue(builder, expr.getArgument(0));
-    }
+  @Override
+  protected void fillBuilder(AssertJBuilder builder, MethodCallExpr expr) {
+    PredicateMigrator.migrateTrue(builder, expr.getArgument(0));
+  }
 
 }

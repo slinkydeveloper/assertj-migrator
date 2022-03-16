@@ -6,24 +6,24 @@ import com.slinkydeveloper.assertjmigrator.nodes.AssertJBuilder;
 
 public class HamcrestAssertThatNotHasItems extends BaseHamcrestAssertThatNot {
 
-    @Override
-    String matcherName() {
-        return "hasItems";
-    }
+  @Override
+  String matcherName() {
+    return "hasItems";
+  }
 
-    @Override
-    boolean matcherVariadic() {
-        return true;
-    }
+  @Override
+  boolean matcherVariadic() {
+    return true;
+  }
 
-    @Override
-    int matcherArity() {
-        return 0;
-    }
+  @Override
+  int matcherArity() {
+    return 0;
+  }
 
-    @Override
-    void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
-        builder.assertThat(actual).doesNotContain(matcher.getArguments());
-    }
+  @Override
+  void fillBuilder(AssertJBuilder builder, Expression actual, MethodCallExpr matcher) {
+    builder.assertThat(actual).doesNotContain(matcher.getArguments());
+  }
 
 }

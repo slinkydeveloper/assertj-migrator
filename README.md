@@ -1,5 +1,7 @@
 # AssertJ Migrator
 
+**The project has been moved to https://github.com/assertj/assertj-migrator**
+
 AssertJ migrator to migrate complex codebase based on JavaParser.
 
 ## Build
